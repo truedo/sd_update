@@ -2,17 +2,17 @@ let port;
 let writer;
 const BUFFER_SIZE = 256;
 
-// GitHub Pages¿¡¼­ ÆÄÀÏ ¸ñ·Ï °¡Á®¿À±â (¿¹Á¦ URL)
+// GitHub Pagesì—ì„œ íŒŒì¼ ëª©ë¡ ê°€ì ¸ì˜¤ê¸° (ì˜ˆì œ URL)
 const FILE_LIST_URL = "https://raw.githubusercontent.com/your-username/your-repo/main/files.json";
 
 async function fetchFileList() {
     try {
         const response = await fetch(FILE_LIST_URL);
         const files = await response.json();
-        log(`?? ÃÑ ${files.length}°³ÀÇ ÆÄÀÏ ¹ß°ß`);
+        log(`ğŸ“‚ ì´ ${files.length}ê°œì˜ íŒŒì¼ ë°œê²¬`);
         return files;
     } catch (error) {
-        log("? ÆÄÀÏ ¸ñ·ÏÀ» ºÒ·¯¿Ã ¼ö ¾ø½À´Ï´Ù.");
+        log("âŒ íŒŒì¼ ëª©ë¡ì„ ë¶ˆëŸ¬ì˜¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
         return [];
     }
 }
@@ -22,29 +22,29 @@ async function connectSerial() {
         port = await navigator.serial.requestPort();
         await port.open({ baudRate: 921600 });
         writer = port.writable.getWriter();
-        log("? ESP32¿Í ¿¬°áµÊ");
+        log("âœ… ESP32ì™€ ì—°ê²°ë¨");
     } catch (error) {
-        log("? Æ÷Æ® ¿¬°á ½ÇÆĞ");
+        log("âŒ í¬íŠ¸ ì—°ê²° ì‹¤íŒ¨");
     }
 }
 
 async function sendFile(filePath, fileData) {
     if (!writer) {
-        log("?? Æ÷Æ®°¡ ¿­·ÁÀÖÁö ¾Ê½À´Ï´Ù.");
+        log("âš ï¸ í¬íŠ¸ê°€ ì—´ë ¤ìˆì§€ ì•ŠìŠµë‹ˆë‹¤.");
         return;
     }
 
     const fileSize = fileData.length;
-    log(`?? Àü¼Û ½ÃÀÛ: ${filePath} (${fileSize} bytes)`);
+    log(`ğŸ“¤ ì „ì†¡ ì‹œì‘: ${filePath} (${fileSize} bytes)`);
 
-    // ÆÄÀÏ °æ·Î ±æÀÌ Àü¼Û
+    // íŒŒì¼ ê²½ë¡œ ê¸¸ì´ ì „ì†¡
     await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
     await writer.write(new TextEncoder().encode(filePath));
 
-    // ÆÄÀÏ Å©±â Àü¼Û
+    // íŒŒì¼ í¬ê¸° ì „ì†¡
     await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
 
-    // ÆÄÀÏ µ¥ÀÌÅÍ Àü¼Û
+    // íŒŒì¼ ë°ì´í„° ì „ì†¡
     let totalSent = 0;
     while (totalSent < fileSize) {
         const chunk = fileData.slice(totalSent, totalSent + BUFFER_SIZE);
@@ -52,12 +52,12 @@ async function sendFile(filePath, fileData) {
         totalSent += chunk.length;
     }
 
-    log(`? Àü¼Û ¿Ï·á: ${filePath}`);
+    log(`âœ… ì „ì†¡ ì™„ë£Œ: ${filePath}`);
 }
 
 async function startFileTransfer() {
     if (!port) {
-        log("?? ¸ÕÀú Æ÷Æ®¸¦ ¼±ÅÃÇÏ¼¼¿ä.");
+        log("âš ï¸ ë¨¼ì € í¬íŠ¸ë¥¼ ì„ íƒí•˜ì„¸ìš”.");
         return;
     }
 
@@ -68,11 +68,11 @@ async function startFileTransfer() {
             const fileData = new Uint8Array(await response.arrayBuffer());
             await sendFile(filePath, fileData);
         } catch (error) {
-            log(`? Àü¼Û ½ÇÆĞ: ${filePath}`);
+            log(`âŒ ì „ì†¡ ì‹¤íŒ¨: ${filePath}`);
         }
     }
 
-    log("?? ¸ğµç ÆÄÀÏ Àü¼Û ¿Ï·á!");
+    log("ğŸ‰ ëª¨ë“  íŒŒì¼ ì „ì†¡ ì™„ë£Œ!");
 }
 
 function log(message) {
