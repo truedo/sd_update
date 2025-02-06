@@ -5,17 +5,46 @@ const BUFFER_SIZE = 256;
 // GitHub Pages에서 파일 목록 가져오기 (예제 URL)
 const FILE_LIST_URL = "https://raw.githubusercontent.com/truedo/sd_update/main/files.json";
 
-async function fetchFileList() {
+
+const GITHUB_USER = "truedo";  
+const REPO_NAME = "sd_update";  
+const BRANCH = "main";  
+const BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${BRANCH}/sd_update_files/`;
+
+async function loadFileList() {
     try {
-        const response = await fetch(FILE_LIST_URL);
-        const files = await response.json();
-        log(`📂 총 ${files.length}개의 파일 발견`);
-        return files;
-    } catch (error) {
-        log("❌ 파일 목록을 불러올 수 없습니다.");
+        const response = await fetch("files.json"); // 로컬 JSON 불러오기
+        const fileList = await response.json();
+
+        // 전체 URL 만들기
+        const fullUrls = fileList.map(file => BASE_URL + file);
+
+        console.log("✅ 다운로드할 파일 목록:", fullUrls);
+        log(`📂 총 ${fileList.length}개의 파일 발견`);
+        return fullUrls;
+    } 
+    catch (error) 
+    {
+        console.error("❌ 파일 목록 불러오기 실패:", error);
         return [];
     }
 }
+
+
+// async function fetchFileList() {
+//     try {
+//         const response = await fetch(FILE_LIST_URL);
+//         const files = await response.json();
+
+
+//         log(`📂 총 ${files.length}개의 파일 발견`);
+//         return files;
+
+//     } catch (error) {
+//         log("❌ 파일 목록을 불러올 수 없습니다.");
+//         return [];
+//     }
+// }
 
 async function connectSerial() {
     try {
@@ -61,7 +90,8 @@ async function startFileTransfer() {
         return;
     }
 
-    const files = await fetchFileList();
+    //const files = await fetchFileList();
+    const files = await loadFileList();
 
 
     // for (const filePath of files) {
