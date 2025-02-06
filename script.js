@@ -3,7 +3,7 @@ let writer;
 const BUFFER_SIZE = 256;
 
 // GitHub Pages에서 파일 목록 가져오기 (예제 URL)
-const FILE_LIST_URL = "https://raw.githubusercontent.com/your-username/your-repo/main/files.json";
+const FILE_LIST_URL = "https://raw.githubusercontent.com/truedo/sd_update/main/files.json";
 
 async function fetchFileList() {
     try {
