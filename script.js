@@ -62,15 +62,17 @@ async function startFileTransfer() {
     }
 
     const files = await fetchFileList();
-    for (const filePath of files) {
-        try {
-            const response = await fetch(filePath);
-            const fileData = new Uint8Array(await response.arrayBuffer());
-            await sendFile(filePath, fileData);
-        } catch (error) {
-            log(`❌ 전송 실패: ${filePath}`);
-        }
-    }
+
+
+    // for (const filePath of files) {
+    //     try {
+    //         const response = await fetch(filePath);
+    //         const fileData = new Uint8Array(await response.arrayBuffer());
+    //         await sendFile(filePath, fileData);
+    //     } catch (error) {
+    //         log(`❌ 전송 실패: ${filePath}`);
+    //     }
+    // }
 
     log("🎉 모든 파일 전송 완료!");
 }
@@ -91,25 +93,18 @@ document.getElementById("connect").addEventListener("click", connectSerial);
 //             alert("❌ Web Serial API를 지원하지 않는 브라우저입니다.");
 //             return;
 //         }
-
 //         const port = await navigator.serial.requestPort();  // 사용자가 포트 선택
 //         await port.open({ baudRate: 9600 }); // 포트 열기
-
 //         const encoder = new TextEncoderStream();
 //         const writableStreamClosed = encoder.readable.pipeTo(port.writable);
 //         const writer = encoder.writable.getWriter();
-        
 //         console.log("✅ 포트 연결됨");
-
 //         // GitHub 파일 다운로드 후 전송
 //         const response = await fetch('https://raw.githubusercontent.com/user/repo/branch/file.txt');
 //         const fileContent = await response.text();
-
 //         await writer.write(fileContent); // 파일 전송
 //         writer.releaseLock();
-
 //         console.log("✅ 파일 전송 완료");
-
 //         // 포트 닫기
 //         await writableStreamClosed;
 //         await port.close();

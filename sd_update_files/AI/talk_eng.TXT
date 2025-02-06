@@ -1,0 +1,24 @@
+Would you like to go on a color adventure with me?
+Tell me the colors.
+You can learn colors from the pictures you take.
+So, shall we go take some pictures?
+Take 10 pictures.
+Great! Now, I'll analyze the colors in the pictures you took.
+I'm analyzing the colors in your pictures. This might take a while!
+Just wait a little longer! Almost done!
+If you see a lot of the same color, you can learn it more accurately!
+I've learned them all! Now, do you want to see which color I've seen the most?
+This color came up the most! From now on, I remember this color the best!
+Shall we check which colors I learned best from the ones you took?
+You can see the most captured color in this graph!
+Ta-da! I think I learned red the best!
+Ta-da! I think I learned orange the best!
+Ta-da! I think I learned yellow the best!
+Ta-da! I think I learned green the best!
+Ta-da! I think I learned sky blue the best!
+Ta-da! I think I learned blue the best!
+Ta-da! I think I learned purple the best!
+Shall we check the colors I learned with the camera now?
+I can recognize the colors I learned when I see them in the camera!
+A border will appear then.
+Today's color adventure with you is over. Let's go on another adventure next time.
