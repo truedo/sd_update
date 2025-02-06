@@ -1,13 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Serial Example</title>
+    <title>ESP32 파일 전송</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #log { max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; text-align: left; }
+        button { padding: 10px; margin: 10px; }
+    </style>
 </head>
 <body>
-    <h1>Web Serial API Example</h1>
-    <button id="connectButton">Connect to Serial Port</button>
+    <h2>ESP32 파일 전송</h2>
+    <button id="connect">포트 선택</button>
+    <button id="start">파일 전송 시작</button>
+    <h3>전송 상태</h3>
+    <div id="log"></div>
     <script src="script.js"></script>
 </body>
 </html>
