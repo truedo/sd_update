@@ -25,12 +25,12 @@ async function connectSerial() {
 
 async function loadFileList() {
     try {
-        const response = await fetch("files.json");
+        const response = await fetch("files.json"); // 로컬 JSON 불러오기             
         const fileList = await response.json();
         const fullUrls = fileList.map(file => BASE_URL + file);
 
         console.log("✅ 다운로드할 파일 목록:", fullUrls);
-        log(`📂 총 ${fileList.length}개의 파일 발견`);
+        console.log(`📂 총 ${fileList.length}개의 파일 발견`);
 
         return fullUrls;
 
