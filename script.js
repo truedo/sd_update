@@ -84,46 +84,55 @@ async function sendFileToESP32(fileUrl, relativePath, index, totalFiles) {
 }
 
 async function validateFilesOnESP32() {
-    try {  
-        // 검증 모드 신호
+    
         await writer.write(new Uint8Array([0xcc])); 
         console.log("✔️ 전송 성공 [0xcc] 시작 바이트");
 
 
-        const fileList = await loadFileList();
-        let failedFiles = [];
+    // try {  
+    //     // 검증 모드 신호
+    //     await writer.write(new Uint8Array([0xcc])); 
+    //     console.log("✔️ 전송 성공 [0xcc] 시작 바이트");
 
-        // 0. 파일 개수 전송
-        await writer.write(new Uint32Array([fileList.length]));
+    //     // 짧은 지연 시간 추가 (예: 100밀리초)
+    //     await new Promise(resolve => setTimeout(resolve, 100));
 
-        console.log(`✔️ 전송 성공: ${fileList.length}개의 파일`);
+    //     const fileList = await loadFileList();
+    //     let failedFiles = [];
+
+    //     // 0. 파일 개수 전송
+    //     await writer.write(new Uint32Array([fileList.length]));
+    //     console.log(`✔️ 전송 성공: ${fileList.length}개의 파일`);
+        
+    //     // 짧은 지연 시간 추가 (예: 100밀리초)
+    //     await new Promise(resolve => setTimeout(resolve, 100));
 
 
-        for (const filePath of fileList) {            
+    //     for (const filePath of fileList) {            
             
-            // 1. 파일 경로 길이
-            await writer.write(new Uint32Array([filePath.length]));
+    //         // 1. 파일 경로 길이
+    //         await writer.write(new Uint32Array([filePath.length]));
 
-            // 파일 이름 전송
-            await writer.write(new TextEncoder().encode(filePath)); 
+    //         // 파일 이름 전송
+    //         await writer.write(new TextEncoder().encode(filePath)); 
             
-            // ESP32가 MD5 체크섬 반환
-            const { value } = await reader.read();
-            const esp32Checksum = new TextDecoder().decode(value).trim();
+    //         // ESP32가 MD5 체크섬 반환
+    //         const { value } = await reader.read();
+    //         const esp32Checksum = new TextDecoder().decode(value).trim();
 
-            if (esp32Checksum === "ERROR") {
-                console.warn(`❌ 검증 실패: ${filePath}`);
-                failedFiles.push(filePath);
-            } else {
-                console.log(`✅ 검증 성공: ${filePath}`);
-            }
-        }
+    //         if (esp32Checksum === "ERROR") {
+    //             console.warn(`❌ 검증 실패: ${filePath}`);
+    //             failedFiles.push(filePath);
+    //         } else {
+    //             console.log(`✅ 검증 성공: ${filePath}`);
+    //         }
+    //     }
 
-        return failedFiles;
-    } catch (error) {
-        console.error("❌ 검증 실패:", error);
-        return [];
-    }
+    //     return failedFiles;
+    // } catch (error) {
+    //     console.error("❌ 검증 실패:", error);
+    //     return [];
+    // }
 }
 
 async function startTransfer() {
@@ -133,18 +142,18 @@ async function startTransfer() {
     let failedFiles = await validateFilesOnESP32();
     let totalFiles = failedFiles.length;
     
-    document.getElementById("progressBarContainer").style.display = "block";
-    updateProgress(0, totalFiles, "전송 준비 중...");
+    // document.getElementById("progressBarContainer").style.display = "block";
+    // updateProgress(0, totalFiles, "전송 준비 중...");
 
-    while (failedFiles.length > 0) {
-        console.log(`📌 ${failedFiles.length}개 파일 재전송 필요`);
-        for (let i = 0; i < failedFiles.length; i++) {
-            const file = failedFiles[i];
-            const fileUrl = BASE_URL + file;
-            await sendFileToESP32(fileUrl, file, i, totalFiles);
-        }
-        failedFiles = await validateFilesOnESP32();
-    }
+    // while (failedFiles.length > 0) {
+    //     console.log(`📌 ${failedFiles.length}개 파일 재전송 필요`);
+    //     for (let i = 0; i < failedFiles.length; i++) {
+    //         const file = failedFiles[i];
+    //         const fileUrl = BASE_URL + file;
+    //         await sendFileToESP32(fileUrl, file, i, totalFiles);
+    //     }
+    //     failedFiles = await validateFilesOnESP32();
+    // }
 
     updateProgress(totalFiles, totalFiles, "🎉 모든 파일 전송 및 검증 완료!");
     console.log("🎉 모든 파일 전송 및 검증 완료!");
