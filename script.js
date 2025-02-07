@@ -87,7 +87,6 @@ async function validateFilesOnESP32() {
         // 🔹 **검증 모드 신호 (0xCC) 정확하게 1바이트 전송**
         await writer.write(new Uint8Array([0xCC]));  
         console.log("✔️ 전송 성공 [0xCC] 시작 바이트");
-
         await new Promise(resolve => setTimeout(resolve, 100)); // 작은 지연
 
         const fileList = await loadFileList();
@@ -96,21 +95,19 @@ async function validateFilesOnESP32() {
         // 0. 파일 개수 전송
         await writer.write(new Uint8Array(new Uint32Array([fileList.length]).buffer));
         console.log(`✔️ 전송 성공: ${fileList.length}개의 파일`);
-
         await new Promise(resolve => setTimeout(resolve, 100));
-
-
-
 
         for (const filePath of fileList) 
         {            
             // 1. 파일 경로 길이 전송
             await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
             console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
+            await new Promise(resolve => setTimeout(resolve, 100));
 
             // 2. 파일 경로 데이터 전송
             await writer.write(new TextEncoder().encode(filePath));
             console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
+            await new Promise(resolve => setTimeout(resolve, 100));
 
             // 3. ESP32가 MD5 체크섬 반환
             const { value } = await reader.read();
