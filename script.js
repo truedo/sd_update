@@ -139,8 +139,8 @@ async function startTransfer() {
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
-    let failedFiles = await validateFilesOnESP32();
-    let totalFiles = failedFiles.length;
+  //  let failedFiles = await validateFilesOnESP32();
+    //let totalFiles = failedFiles.length;
     
     // document.getElementById("progressBarContainer").style.display = "block";
     // updateProgress(0, totalFiles, "전송 준비 중...");
