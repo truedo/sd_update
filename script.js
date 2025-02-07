@@ -99,7 +99,11 @@ async function validateFilesOnESP32() {
 
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        for (const filePath of fileList) {            
+
+
+
+        for (const filePath of fileList) 
+        {            
             // 1. 파일 경로 길이 전송
             await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
             console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
@@ -112,12 +116,18 @@ async function validateFilesOnESP32() {
             const { value } = await reader.read();
             const esp32Checksum = new TextDecoder().decode(value).trim();
 
-            if (esp32Checksum === "ERROR") {
+            if (esp32Checksum === "ERROR") 
+            {
                 console.warn(`❌ 검증 실패: ${filePath}`);
                 failedFiles.push(filePath);
-            } else {
+            } 
+            else 
+            {
                 console.log(`✅ 검증 성공: ${filePath}`);
             }
+
+            // 짧은 지연 시간 추가 (예: 100밀리초)
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
 
         return failedFiles;
