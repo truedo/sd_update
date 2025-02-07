@@ -27,7 +27,13 @@ async function loadFileList() {
     try {
         const response = await fetch("files.json");
         const fileList = await response.json();
-        return fileList.map(file => BASE_URL + file);
+        const fullUrls = fileList.map(file => BASE_URL + file);
+
+        console.log("✅ 다운로드할 파일 목록:", fullUrls);
+        log(`📂 총 ${fileList.length}개의 파일 발견`);
+
+        return fullUrls;
+
     } catch (error) {
         console.error("❌ 파일 목록 로드 실패:", error);
         return [];
@@ -96,9 +102,11 @@ async function validateFilesOnESP32() {
         for (const filePath of fileList) {            
             // 1. 파일 경로 길이 전송
             await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
+            console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
 
             // 2. 파일 경로 데이터 전송
             await writer.write(new TextEncoder().encode(filePath));
+            console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
 
             // 3. ESP32가 MD5 체크섬 반환
             const { value } = await reader.read();
