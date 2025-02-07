@@ -10,8 +10,7 @@ const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
 async function connectSerial() {
-    try {
-        console.log("✅ ver 3");
+    try {        
         port = await navigator.serial.requestPort();
         await port.open({ baudRate: BAUD_RATE });
 
@@ -82,7 +81,8 @@ async function sendFileToESP32(fileUrl, relativePath, index, totalFiles)
             return false;
         }
     } 
-    catch (error) {
+    catch (error) 
+    {
         console.error(`❌ 파일 전송 오류: ${relativePath}`, error);
         updateProgress(index, totalFiles, `❌ 오류: ${relativePath}`);
         return false;
@@ -136,7 +136,7 @@ async function validateFilesOnESP32() {
                 await new Promise(resolve => setTimeout(resolve, 100));
 
                 await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
-                console.log("✔️ 전송 성공 [0xCC] 시작 바이트");
+                console.log("✔️ 전송 성공 [0xee] 전송 시작 바이트");
                 await new Promise(resolve => setTimeout(resolve, 100));
 
                 await writer.write(new Uint8Array(1));
@@ -151,7 +151,7 @@ async function validateFilesOnESP32() {
                 await new Promise(resolve => setTimeout(resolve, 100));
         
                 await writer.write(new Uint8Array(new Uint32Array([fileList.length - send_file_index]).buffer)); // 0. 파일 개수 전송
-                console.log(`✔️ 전송 성공: ${ileList.length - send_file_index}개의 파일`);
+                console.log(`✔️ 전송 성공: ${fileList.length - send_file_index}개의 파일`);
                 await new Promise(resolve => setTimeout(resolve, 100));
                 
               
@@ -177,6 +177,7 @@ async function validateFilesOnESP32() {
 }
 
 async function startTransfer() {
+    console.log("✅ ver 4");
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
