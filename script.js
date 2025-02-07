@@ -11,6 +11,7 @@ const TIMEOUT = 3000; // ms
 
 async function connectSerial() {
     try {
+        console.log("✅ ver 1");
         port = await navigator.serial.requestPort();
         await port.open({ baudRate: BAUD_RATE });
 
