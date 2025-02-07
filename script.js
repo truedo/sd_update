@@ -139,7 +139,7 @@ async function startTransfer() {
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
-  //  let failedFiles = await validateFilesOnESP32();
+    let failedFiles = await validateFilesOnESP32();
     //let totalFiles = failedFiles.length;
     
     // document.getElementById("progressBarContainer").style.display = "block";
@@ -155,7 +155,7 @@ async function startTransfer() {
     //     failedFiles = await validateFilesOnESP32();
     // }
 
-    updateProgress(totalFiles, totalFiles, "🎉 모든 파일 전송 및 검증 완료!");
+   // updateProgress(totalFiles, totalFiles, "🎉 모든 파일 전송 및 검증 완료!");
     console.log("🎉 모든 파일 전송 및 검증 완료!");
 }
 
