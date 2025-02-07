@@ -85,8 +85,13 @@ async function sendFileToESP32(fileUrl, relativePath, index, totalFiles) {
 
 async function validateFilesOnESP32() {
     
-        await writer.write(new Uint8Array([0xcc])); 
-        console.log("✔️ 전송 성공 [0xcc] 시작 바이트");
+
+    const writer = port.writable.getWriter();
+    await writer.write(new Uint8Array([0xCC])); // 단일 바이트 0xCC 전송
+    writer.releaseLock();
+
+     //  await writer.write(new Uint8Array([0xcc])); 
+    console.log("✔️ 전송 성공 [0xcc] 시작 바이트");
 
 
     // try {  
