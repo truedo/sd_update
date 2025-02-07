@@ -84,14 +84,24 @@ async function sendFileToESP32(fileUrl, relativePath, index, totalFiles) {
 }
 
 async function validateFilesOnESP32() {
-    try {
-        await writer.write(new Uint8Array([0xcc])); // 검증 모드 신호
+    try {  
+        // 검증 모드 신호
+        await writer.write(new Uint8Array([0xcc])); 
 
         const fileList = await loadFileList();
         let failedFiles = [];
 
-        for (const filePath of fileList) {
-            await writer.write(new TextEncoder().encode(filePath)); // 파일 이름 전송
+        // 0. 파일 개수 전송
+        await writer.write(new Uint32Array([fileList.length]));
+
+
+        for (const filePath of fileList) {            
+            
+            // 1. 파일 경로 길이
+            await writer.write(new Uint32Array([filePath.length]));
+
+            // 파일 이름 전송
+            await writer.write(new TextEncoder().encode(filePath)); 
             
             // ESP32가 MD5 체크섬 반환
             const { value } = await reader.read();
