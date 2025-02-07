@@ -87,12 +87,16 @@ async function validateFilesOnESP32() {
     try {  
         // 검증 모드 신호
         await writer.write(new Uint8Array([0xcc])); 
+        console.log("✔️ 전송 성공 [0xcc] 시작 바이트");
+
 
         const fileList = await loadFileList();
         let failedFiles = [];
 
         // 0. 파일 개수 전송
         await writer.write(new Uint32Array([fileList.length]));
+
+        console.log(`✔️ 전송 성공: ${fileList.length}개의 파일`);
 
 
         for (const filePath of fileList) {            
