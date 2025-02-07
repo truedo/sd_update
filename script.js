@@ -14,14 +14,9 @@ async function connectSerial() {
         port = await navigator.serial.requestPort();
         await port.open({ baudRate: BAUD_RATE });
 
-        const textEncoder = new TextEncoderStream();
-        const textDecoder = new TextDecoderStream();
-        const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-        const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
-        
-        writer = textEncoder.writable.getWriter();
-        reader = textDecoder.readable.getReader();
-        
+        writer = port.writable.getWriter();
+        reader = port.readable.getReader();
+
         console.log("✅ ESP32 연결 성공!");
     } catch (error) {
         console.error("❌ ESP32 연결 실패:", error);
@@ -50,15 +45,13 @@ async function sendFileToESP32(fileUrl, relativePath, index, totalFiles) {
         updateProgress(index, totalFiles, `전송 중: ${relativePath}`);
 
         // 1. 파일 경로 길이 전송
-        const pathLength = new Uint32Array([relativePath.length]);
-        await writer.write(pathLength);
+        await writer.write(new Uint8Array(new Uint32Array([relativePath.length]).buffer));
 
         // 2. 파일 경로 전송
         await writer.write(new TextEncoder().encode(relativePath));
 
         // 3. 파일 크기 전송
-        const fileSizeBuffer = new Uint32Array([fileSize]);
-        await writer.write(fileSizeBuffer);
+        await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
 
         // 4. 파일 데이터 전송
         await writer.write(new Uint8Array(fileData));
@@ -66,8 +59,8 @@ async function sendFileToESP32(fileUrl, relativePath, index, totalFiles) {
         console.log(`✅ 전송 완료: ${relativePath}`);
 
         // 5. ESP32로부터 ACK 수신
-        const ack = await reader.read();
-        if (ack.value === "\xe1") {
+        const { value } = await reader.read();
+        if (value === "\xe1") {
             console.log("✔️ 전송 성공");
             updateProgress(index + 1, totalFiles, `✅ 완료: ${relativePath}`);
             return true;
@@ -84,60 +77,46 @@ async function sendFileToESP32(fileUrl, relativePath, index, totalFiles) {
 }
 
 async function validateFilesOnESP32() {
-    
+    try {  
+        // 🔹 **검증 모드 신호 (0xCC) 정확하게 1바이트 전송**
+        await writer.write(new Uint8Array([0xCC]));  
+        console.log("✔️ 전송 성공 [0xCC] 시작 바이트");
 
-    const writer = port.writable.getWriter();
-    await writer.write(new Uint8Array([0xCC])); // 단일 바이트 0xCC 전송
-    writer.releaseLock();
+        await new Promise(resolve => setTimeout(resolve, 100)); // 작은 지연
 
-     //  await writer.write(new Uint8Array([0xcc])); 
-    console.log("✔️ 전송 성공 [0xcc] 시작 바이트");
+        const fileList = await loadFileList();
+        let failedFiles = [];
 
+        // 0. 파일 개수 전송
+        await writer.write(new Uint8Array(new Uint32Array([fileList.length]).buffer));
+        console.log(`✔️ 전송 성공: ${fileList.length}개의 파일`);
 
-    // try {  
-    //     // 검증 모드 신호
-    //     await writer.write(new Uint8Array([0xcc])); 
-    //     console.log("✔️ 전송 성공 [0xcc] 시작 바이트");
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-    //     // 짧은 지연 시간 추가 (예: 100밀리초)
-    //     await new Promise(resolve => setTimeout(resolve, 100));
+        for (const filePath of fileList) {            
+            // 1. 파일 경로 길이 전송
+            await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
 
-    //     const fileList = await loadFileList();
-    //     let failedFiles = [];
+            // 2. 파일 경로 데이터 전송
+            await writer.write(new TextEncoder().encode(filePath));
 
-    //     // 0. 파일 개수 전송
-    //     await writer.write(new Uint32Array([fileList.length]));
-    //     console.log(`✔️ 전송 성공: ${fileList.length}개의 파일`);
-        
-    //     // 짧은 지연 시간 추가 (예: 100밀리초)
-    //     await new Promise(resolve => setTimeout(resolve, 100));
+            // 3. ESP32가 MD5 체크섬 반환
+            const { value } = await reader.read();
+            const esp32Checksum = new TextDecoder().decode(value).trim();
 
+            if (esp32Checksum === "ERROR") {
+                console.warn(`❌ 검증 실패: ${filePath}`);
+                failedFiles.push(filePath);
+            } else {
+                console.log(`✅ 검증 성공: ${filePath}`);
+            }
+        }
 
-    //     for (const filePath of fileList) {            
-            
-    //         // 1. 파일 경로 길이
-    //         await writer.write(new Uint32Array([filePath.length]));
-
-    //         // 파일 이름 전송
-    //         await writer.write(new TextEncoder().encode(filePath)); 
-            
-    //         // ESP32가 MD5 체크섬 반환
-    //         const { value } = await reader.read();
-    //         const esp32Checksum = new TextDecoder().decode(value).trim();
-
-    //         if (esp32Checksum === "ERROR") {
-    //             console.warn(`❌ 검증 실패: ${filePath}`);
-    //             failedFiles.push(filePath);
-    //         } else {
-    //             console.log(`✅ 검증 성공: ${filePath}`);
-    //         }
-    //     }
-
-    //     return failedFiles;
-    // } catch (error) {
-    //     console.error("❌ 검증 실패:", error);
-    //     return [];
-    // }
+        return failedFiles;
+    } catch (error) {
+        console.error("❌ 검증 실패:", error);
+        return [];
+    }
 }
 
 async function startTransfer() {
@@ -145,22 +124,22 @@ async function startTransfer() {
 
     console.log("🔍 파일 검증 중...");
     let failedFiles = await validateFilesOnESP32();
-    //let totalFiles = failedFiles.length;
+    let totalFiles = failedFiles.length;
     
-    // document.getElementById("progressBarContainer").style.display = "block";
-    // updateProgress(0, totalFiles, "전송 준비 중...");
+    document.getElementById("progressBarContainer").style.display = "block";
+    updateProgress(0, totalFiles, "전송 준비 중...");
 
-    // while (failedFiles.length > 0) {
-    //     console.log(`📌 ${failedFiles.length}개 파일 재전송 필요`);
-    //     for (let i = 0; i < failedFiles.length; i++) {
-    //         const file = failedFiles[i];
-    //         const fileUrl = BASE_URL + file;
-    //         await sendFileToESP32(fileUrl, file, i, totalFiles);
-    //     }
-    //     failedFiles = await validateFilesOnESP32();
-    // }
+    while (failedFiles.length > 0) {
+        console.log(`📌 ${failedFiles.length}개 파일 재전송 필요`);
+        for (let i = 0; i < failedFiles.length; i++) {
+            const file = failedFiles[i];
+            const fileUrl = BASE_URL + file;
+            await sendFileToESP32(fileUrl, file, i, totalFiles);
+        }
+        failedFiles = await validateFilesOnESP32();
+    }
 
-   // updateProgress(totalFiles, totalFiles, "🎉 모든 파일 전송 및 검증 완료!");
+    updateProgress(totalFiles, totalFiles, "🎉 모든 파일 전송 및 검증 완료!");
     console.log("🎉 모든 파일 전송 및 검증 완료!");
 }
 
