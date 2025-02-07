@@ -11,7 +11,7 @@ const TIMEOUT = 3000; // ms
 
 async function connectSerial() {
     try {
-        console.log("✅ ver 1");
+        console.log("✅ ver 2");
         port = await navigator.serial.requestPort();
         await port.open({ baudRate: BAUD_RATE });
 
@@ -88,7 +88,7 @@ async function validateFilesOnESP32() {
         // 🔹 **검증 모드 신호 (0xCC) 정확하게 1바이트 전송**
         await writer.write(new Uint8Array([0xCC]));  
         console.log("✔️ 전송 성공 [0xCC] 시작 바이트");
-        await new Promise(resolve => setTimeout(resolve, 100)); // 작은 지연
+        await new Promise(resolve => setTimeout(resolve, 200)); // 작은 지연
 
         const fileList = await loadFileList();
         let failedFiles = [];
@@ -96,19 +96,19 @@ async function validateFilesOnESP32() {
         // 0. 파일 개수 전송
         await writer.write(new Uint8Array(new Uint32Array([fileList.length]).buffer));
         console.log(`✔️ 전송 성공: ${fileList.length}개의 파일`);
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         for (const filePath of fileList) 
         {            
             // 1. 파일 경로 길이 전송
             await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
             console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 200));
 
             // 2. 파일 경로 데이터 전송
             await writer.write(new TextEncoder().encode(filePath));
             console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 200));
 
             // 3. ESP32가 MD5 체크섬 반환
             const { value } = await reader.read();
@@ -125,7 +125,7 @@ async function validateFilesOnESP32() {
             }
 
             // 짧은 지연 시간 추가 (예: 100밀리초)
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 200));
         }
 
         return failedFiles;
