@@ -143,7 +143,8 @@ async function validateFilesOnESP32() {
                 console.log(`✔️ 전송 성공: 1 개의 파일`); // 파일 갯수
                 await new Promise(resolve => setTimeout(resolve, 100));
 
-                sendFileToESP32(filePath, filePath, 0, 1); // 파일 전송
+                const fileUrl = BASE_URL + file;
+                sendFileToESP32(fileUrl, filePath, 0, 1); // 파일 전송
                 await new Promise(resolve => setTimeout(resolve, 100));
 
                 await writer.write(new Uint8Array([0xcc]));   // 검증 모드 신호
@@ -177,7 +178,7 @@ async function validateFilesOnESP32() {
 }
 
 async function startTransfer() {
-    console.log("✅ ver 4");
+    console.log("✅ ver 5");
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
