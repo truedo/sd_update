@@ -5,17 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESP32 파일 전송</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        #log { max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; text-align: left; }
-        button { padding: 10px; margin: 10px; }
+        #progressBarContainer {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+            display: none;
+        }
+        #progressBar {
+            width: 0%;
+            height: 25px;
+            background-color: #4CAF50;
+            text-align: center;
+            line-height: 25px;
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <h2>ESP32 파일 전송</h2>
-    <button id="connect">포트 선택</button>
-    <button id="start">파일 전송 시작</button>
-    <h3>전송 상태</h3>
-    <div id="log"></div>
+
+    <h2>ESP32 파일 전송 시스템</h2>
+    <button onclick="startTransfer()">파일 전송 시작</button>
+
+    <div id="progressBarContainer">
+        <div id="progressBar">0%</div>
+    </div>
+    <p id="progressText">전송 준비 중...</p>
+
     <script src="script.js"></script>
+
 </body>
 </html>
