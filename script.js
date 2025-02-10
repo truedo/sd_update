@@ -62,7 +62,7 @@ async function testSingleFileTransfer() {
     console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    await writer.write(new Uint8Array(0x01));
+    await writer.write(new Uint8Array([0x01]));
     console.log(`✔️ 전송 성공: 1 개의 파일`); // 파일 갯수
     await new Promise(resolve => setTimeout(resolve, 100));
 
