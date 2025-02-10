@@ -41,7 +41,7 @@ async function loadFileList() {
 }
 
 async function testSingleFileTransfer() {
-    console.log("✅ ver 11");
+    console.log("✅ ver 12");
     await connectSerial(); // ESP32 연결
 
     const fileList = await loadFileList();
@@ -68,7 +68,7 @@ async function testSingleFileTransfer() {
 
     // 파일 경로 길이
     await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
-    console.log(`✔️ ${send_file_index} 전송 성공: ${filePath.length} 파일 길이`);
+    console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
     await new Promise(resolve => setTimeout(resolve, 100));
 
     // 파일 경로 데이터 전송
