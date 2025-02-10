@@ -41,6 +41,7 @@ async function loadFileList() {
 }
 
 async function testSingleFileTransfer() {
+    console.log("✅ ver 8");
     await connectSerial(); // ESP32 연결
 
     const fileList = await loadFileList();
@@ -61,7 +62,7 @@ async function testSingleFileTransfer() {
     console.log("✔️ 전송 성공 [0xee] 전송 시작 바이트");
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    await writer.write(new Uint8Array(1));
+    await writer.write(new Uint32Array(1));
     console.log(`✔️ 전송 성공: 1 개의 파일`); // 파일 갯수
     await new Promise(resolve => setTimeout(resolve, 100));
 
