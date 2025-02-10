@@ -53,18 +53,22 @@ async function sendFileToESP32(fileUrl, relativePath, index, totalFiles)
 
         // 1. 파일 경로 길이 전송
         await writer.write(new Uint8Array(new Uint32Array([relativePath.length]).buffer));
+        console.log(`✔️ 전송 성공: ${relativePath.length} 파일 길이`);
         await new Promise(resolve => setTimeout(resolve, 100));
 
         // 2. 파일 경로 전송
         await writer.write(new TextEncoder().encode(relativePath));
+        console.log(`✔️ 전송 성공: ${relativePath} 파일 이름`);
         await new Promise(resolve => setTimeout(resolve, 100));
 
         // 3. 파일 크기 전송
         await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
+        console.log(`✔️ 전송 성공: ${fileSize} 파일 크기`);
         await new Promise(resolve => setTimeout(resolve, 100));
 
         // 4. 파일 데이터 전송
         await writer.write(new Uint8Array(fileData));
+        console.log(`✔️ 데이터 전송 시작`);
         await new Promise(resolve => setTimeout(resolve, 100));
 
         console.log(`✅ 전송 완료: ${relativePath}`);
@@ -176,7 +180,7 @@ async function validateFilesOnESP32() {
 }
 
 async function startTransfer() {
-    console.log("✅ ver 6");
+    console.log("✅ ver 7");
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
