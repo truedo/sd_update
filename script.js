@@ -40,6 +40,35 @@ async function loadFileList() {
     }
 }
 
+async function testSingleFileTransfer() {
+    await connectSerial(); // ESP32 연결
+
+    const fileList = await loadFileList();
+    if (fileList.length === 0) {
+        console.log("❌ 전송할 파일이 없습니다.");
+        return;
+    }
+
+
+    const fileUrl = fileList[0]; // 첫 번째 파일 가져오기
+    const filePath = fileUrl.replace(BASE_URL, ""); // 상대 경로 추출
+
+    console.log(`🚀 테스트 전송 시작: ${filePath}`);
+    console.log(`🚀 url: ${fileUrl}`);
+    console.log(`🚀 file: ${filePath}`);
+
+    await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
+    console.log("✔️ 전송 성공 [0xee] 전송 시작 바이트");
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    await writer.write(new Uint8Array(1));
+    console.log(`✔️ 전송 성공: 1 개의 파일`); // 파일 갯수
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    await sendFileToESP32(fileUrl, filePath, 0, 1); // 첫 번째 파일만 전송
+    console.log(`🎉 테스트 전송 완료: ${filePath}`);
+}
+
 async function sendFileToESP32(fileUrl, relativePath, index, totalFiles) 
 {
     try {
@@ -178,6 +207,7 @@ async function validateFilesOnESP32() {
         return [];
     }
 }
+
 
 async function startTransfer() {
     console.log("✅ ver 7");
