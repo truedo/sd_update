@@ -41,7 +41,7 @@ async function loadFileList() {
 }
 
 async function testSingleFileTransfer() {
-    console.log("✅ ver 8");
+    console.log("✅ ver 9");
     await connectSerial(); // ESP32 연결
 
     const fileList = await loadFileList();
@@ -59,10 +59,10 @@ async function testSingleFileTransfer() {
     console.log(`🚀 file: ${filePath}`);
 
     await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
-    console.log("✔️ 전송 성공 [0xee] 전송 시작 바이트");
+    console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    await writer.write(new Uint32Array(1));
+    await writer.write(new Uint8Array(1234));
     console.log(`✔️ 전송 성공: 1 개의 파일`); // 파일 갯수
     await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -127,7 +127,7 @@ async function validateFilesOnESP32() {
     try {  
         // 🔹 **검증 모드 신호 (0xCC) 정확하게 1바이트 전송**
         await writer.write(new Uint8Array([0xCC]));  
-        console.log("✔️ 전송 성공 [0xCC] 시작 바이트");
+        console.log("✔️ 전송 성공 [0xCC] 검증 시작 바이트");
         await new Promise(resolve => setTimeout(resolve, 100)); // 작은 지연
 
         const fileList = await loadFileList();
@@ -169,7 +169,7 @@ async function validateFilesOnESP32() {
                 await new Promise(resolve => setTimeout(resolve, 100));
 
                 await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
-                console.log("✔️ 전송 성공 [0xee] 전송 시작 바이트");
+                console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
                 await new Promise(resolve => setTimeout(resolve, 100));
 
                 await writer.write(new Uint8Array(1));
@@ -181,7 +181,7 @@ async function validateFilesOnESP32() {
                 await new Promise(resolve => setTimeout(resolve, 100));
 
                 await writer.write(new Uint8Array([0xcc]));   // 검증 모드 신호
-                console.log("✔️ 전송 성공 [0xCC] 시작 바이트");
+                console.log("✔️ 전송 성공 [0xCC] 검증 시작 바이트");
                 await new Promise(resolve => setTimeout(resolve, 100));
         
                 await writer.write(new Uint8Array(new Uint32Array([fileList.length - send_file_index]).buffer)); // 0. 파일 개수 전송
