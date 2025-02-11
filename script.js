@@ -80,6 +80,8 @@ async function testSingleFileTransfer2(fileUrl, filePath)
 
     while (retryCount < MAX_RETRIES && !success) 
     {
+       
+
         if (retryCount > 0) 
         {
             console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES}`);
@@ -169,6 +171,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
             //}
             retryCount++;
         }
+        await new Promise(resolve => setTimeout(resolve, 100));
     }
     if (!success) 
     {
