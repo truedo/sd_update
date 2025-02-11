@@ -119,7 +119,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         for (let i = 0; i < fileSize; i += BUFFER_SIZE) {
             const chunk = fileArray.slice(i, i + BUFFER_SIZE);
             await writer.write(chunk);
-            await new Promise(resolve => setTimeout(resolve, 1));
+            await new Promise(resolve => setTimeout(resolve, 10));
             totalSent += chunk.length;
 
             // 진행률 표시
@@ -129,7 +129,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
 
         //console.log(`✅ 전송 완료: ${filePath}`);
 
-        console.warn(`❓ 수신 ACK 대기중`);
+        console.log(`❓ 수신 ACK 대기중`);
 
         // ESP32로부터 ACK 수신
         const { value } = await reader.read();
@@ -203,7 +203,6 @@ async function testSingleFileTransfer()
         {
             console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES_SEND}`);
         }
-
 
         // 파일 경로 길이 전송
         await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
@@ -351,7 +350,7 @@ async function validateFilesOnESP32() {
         // 🔹 **검증 모드 신호 (0xCC) 정확하게 1바이트 전송**
         await writer.write(new Uint8Array([0xCC]));  
        // console.log("✔️ 전송 성공 [0xCC] 검증 시작 바이트");
-        await new Promise(resolve => setTimeout(resolve, 100)); // 작은 지연
+        await new Promise(resolve => setTimeout(resolve, 500)); // 작은 지연
 
         const fileList = await loadFileList();
         let failedFiles = [];
@@ -359,7 +358,7 @@ async function validateFilesOnESP32() {
         // 0. 파일 개수 전송
         await writer.write(new Uint8Array(new Uint32Array([fileList.length]).buffer));
         console.log(`✔️ 전송 성공: ${fileList.length}개의 파일`);
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         let send_file_index = 0
 
@@ -370,12 +369,12 @@ async function validateFilesOnESP32() {
             // 1. 파일 경로 길이 전송
             await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
            // console.log(`✔️ ${send_file_index} 전송 성공: ${filePath.length} 파일 길이`);
-            await new Promise(resolve => setTimeout(resolve, 300));
+            await new Promise(resolve => setTimeout(resolve, 500));
 
             // 2. 파일 경로 데이터 전송
             await writer.write(new TextEncoder().encode(filePath));
           //  console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
-            await new Promise(resolve => setTimeout(resolve, 300));
+            await new Promise(resolve => setTimeout(resolve, 500));
 
 
           
@@ -394,15 +393,15 @@ async function validateFilesOnESP32() {
 
                 console.warn(`❌ 검증 실패: ${filePath}`);
                 //failedFiles.push(filePath);
-                await new Promise(resolve => setTimeout(resolve, 300));
+                await new Promise(resolve => setTimeout(resolve, 500));
 
                 const fileUrl = BASE_URL + filePath;
                 await testSingleFileTransfer2(fileUrl, filePath);
-                await new Promise(resolve => setTimeout(resolve, 300));
+                await new Promise(resolve => setTimeout(resolve, 500));
 
                 await writer.write(new Uint8Array([0xcc]));   // 검증 모드 신호
                // console.log("✔️ 전송 성공 [0xCC] 검증 시작 바이트");
-                await new Promise(resolve => setTimeout(resolve, 300));
+                await new Promise(resolve => setTimeout(resolve, 500));
         
                 await writer.write(new Uint8Array(new Uint32Array([fileList.length - send_file_index]).buffer)); // 0. 파일 개수 전송
                 console.log(`✔️ ${send_file_index} 남은 갯수: ${fileList.length - send_file_index}개`);
