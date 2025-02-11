@@ -344,8 +344,9 @@ async function sendFileToESP32(fileUrl, relativePath, index, totalFiles)
     }
 }
 
-async function validateFilesOnESP32() {
-    try {  
+async function validateFilesOnESP32() {    
+   // let retryCount = 0;
+    // try {  
         // 🔹 **검증 모드 신호 (0xCC) 정확하게 1바이트 전송**
         await writer.write(new Uint8Array([0xCC]));  
        // console.log("✔️ 전송 성공 [0xCC] 검증 시작 바이트");
@@ -370,13 +371,13 @@ async function validateFilesOnESP32() {
            // console.log(`✔️ ${send_file_index} 전송 성공: ${filePath.length} 파일 길이`);
             await new Promise(resolve => setTimeout(resolve, 500));
 
-
             // 2. 파일 경로 데이터 전송
             await writer.write(new TextEncoder().encode(filePath));
           //  console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
             await new Promise(resolve => setTimeout(resolve, 500));
-          
 
+
+          
             console.log(`❓ ${send_file_index} 검증 ACK 대기중`);
             
             // 3. ESP32가 MD5 체크섬 반환
@@ -415,11 +416,11 @@ async function validateFilesOnESP32() {
             await new Promise(resolve => setTimeout(resolve, 500));
         }
 
-        return failedFiles;
-    } catch (error) {
-        console.error("❌ 검증 실패:", error);
-        return [];
-    }
+    //     return failedFiles;
+    // } catch (error) {
+    //     console.error("❌ 검증 실패:", error);
+    //     return [];
+    // }
 }
 
 async function startTransfer() {
@@ -427,7 +428,8 @@ async function startTransfer() {
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
-    let failedFiles = await validateFilesOnESP32();
+    //let failedFiles = 
+    await validateFilesOnESP32();
     // let totalFiles = failedFiles.length;
     
     // document.getElementById("progressBarContainer").style.display = "block";
