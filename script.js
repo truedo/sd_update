@@ -140,6 +140,8 @@ async function testSingleFileTransfer2(fileUrl, filePath)
 
         //console.log(`✅ 전송 완료: ${filePath}`);
 
+        console.warn(`❓ 수신 ACK 대기중`);
+
         // ESP32로부터 ACK 수신
         const { value } = await reader.read();
         const receivedByte = value[0]; 
@@ -387,7 +389,8 @@ async function validateFilesOnESP32() {
 
           
 
-
+            console.log(`❓ 검증 ACK 대기중`);
+            
             // 3. ESP32가 MD5 체크섬 반환
             const { value } = await reader.read();
             const esp32Checksum = new TextDecoder().decode(value).trim();
