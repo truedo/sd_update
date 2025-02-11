@@ -29,7 +29,7 @@ async function loadFileList() {
         const fileList = await response.json();
         const fullUrls = fileList.map(file => file);
 
-        console.log("✅ 다운로드할 파일 목록:", fullUrls);
+       // console.log("✅ 다운로드할 파일 목록:", fullUrls);
         console.log(`📂 총 ${fileList.length}개의 파일 발견`);
 
         return fullUrls;
@@ -47,7 +47,7 @@ const MAX_RETRIES = 3; // 최대 재전송 횟수
 
 async function testSingleFileTransfer2(fileUrl, filePath) 
 {
-    console.log("✅ ver 9");
+   // console.log("✅ ver 9");
     // await connectSerial(); // ESP32 연결
 
     // const fileList = await loadFileList();
@@ -59,7 +59,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
     //const fileUrl = BASE_URL + fileList[0]; // 첫 번째 파일 가져오기
     //const filePath = fileList[0]; // 상대 경로 유지
 
-    console.log(`🚀 테스트 전송 시작: ${filePath}`);
+    console.log(`🚀 전송 시작: ${filePath}`);
 
     let retryCount = 0;
     let success = false;
@@ -98,13 +98,13 @@ async function testSingleFileTransfer2(fileUrl, filePath)
 
         const contentLength = response.headers.get("Content-Length");
         if (contentLength) {
-            console.log(`📏 서버 제공 파일 크기: ${contentLength} bytes`);
+          //  console.log(`📏 서버 제공 파일 크기: ${contentLength} bytes`);
         }
 
         const fileData = await response.arrayBuffer();
         const fileSize = fileData.byteLength;
 
-        console.log(`📥 다운로드한 파일 크기: ${fileSize} bytes`);
+       // console.log(`📥 다운로드한 파일 크기: ${fileSize} bytes`);
         if (contentLength && fileSize !== parseInt(contentLength)) 
             {
             console.error("⚠️ 파일 크기 불일치! 네트워크 문제 가능성 있음.");
@@ -120,7 +120,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         let totalSent = 0;
         const fileArray = new Uint8Array(fileData);
 
-        console.log(`📤 파일 전송 시작: ${filePath}`);
+      //  console.log(`📤 파일 전송 시작: ${filePath}`);
         for (let i = 0; i < fileSize; i += BUFFER_SIZE) {
             const chunk = fileArray.slice(i, i + BUFFER_SIZE);
             await writer.write(chunk);
@@ -138,7 +138,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         const { value } = await reader.read();
         const receivedByte = value[0]; 
 
-        console.log(`📩 받은 ACK: 0x${receivedByte.toString(16).toUpperCase()}`); // hex 출력
+       // console.log(`📩 받은 ACK: 0x${receivedByte.toString(16).toUpperCase()}`); // hex 출력
 
         if (receivedByte === 0xE1) 
         { 
@@ -147,18 +147,18 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         } 
         else 
         {
-            if (receivedByte === 0xE2) 
-            {
-                console.warn("❌ 파일 바이트 부족 - 재전송 필요");
-            } 
-            else if (receivedByte === 0xE3) 
-            {
-                console.warn("❌ 파일 바이트 다름 - 재전송 필요");
-            } 
-            else 
-            {
-                console.warn("❌ 알 수 없는 전송 오류 - 재전송 필요");
-            }
+            // if (receivedByte === 0xE2) 
+            // {
+            //     console.warn("❌ 파일 바이트 부족 - 재전송 필요");
+            // } 
+            // else if (receivedByte === 0xE3) 
+            // {
+            //     console.warn("❌ 파일 바이트 다름 - 재전송 필요");
+            // } 
+            // else 
+            // {
+                console.warn("❌ 전송 오류 - 재전송 필요");
+            //}
             retryCount++;
         }
     }
@@ -436,7 +436,7 @@ async function validateFilesOnESP32() {
 
 
 async function startTransfer() {
-    console.log("✅ ver 9");
+    console.log("✅ ver 11");
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
