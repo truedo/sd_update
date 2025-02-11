@@ -194,9 +194,21 @@ async function testSingleFileTransfer3(fileUrl, filePath)
     console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
     await new Promise(resolve => setTimeout(resolve, 100));
 
+
+           // 테스트 대기
+           await new Promise(resolve => setTimeout(resolve, 10000));
+
+
+
+
     await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
     console.log(`✔️ 전송 성공: 1 개의 파일`);
     await new Promise(resolve => setTimeout(resolve, 100));
+
+
+           // 테스트 대기
+           await new Promise(resolve => setTimeout(resolve, 10000));
+
 
 
     while (retryCount < MAX_RETRIES_SEND && !success) 
@@ -523,8 +535,7 @@ async function validateFilesOnESP32() {
                 //failedFiles.push(filePath);
                 await new Promise(resolve => setTimeout(resolve, 500));
 
-                // 테스트 대기
-                await new Promise(resolve => setTimeout(resolve, 10000));
+     
 
 
                 const fileUrl = BASE_URL + filePath;
