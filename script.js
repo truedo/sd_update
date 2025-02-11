@@ -39,7 +39,7 @@ async function loadFileList() {
         return [];
     }
 }
-const BUFFER_SIZE = 64; // 버퍼 크기 설정
+const BUFFER_SIZE = 256; // 버퍼 크기 설정
 
 async function testSingleFileTransfer() {
     console.log("✅ ver 3");
