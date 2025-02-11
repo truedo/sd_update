@@ -9,7 +9,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.2'; 
+const VERSION_JS = '1.0.3'; 
 
 const BUFFER_SIZE = 32; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
@@ -538,8 +538,6 @@ async function validateFilesOnESP32() {
             const esp32Checksum = new TextDecoder().decode(value).trim();
 
 
-
-
             if (esp32Checksum === "ERROR") 
             {
                 console.log(`📩 받은 ACK: ${esp32Checksum}`); // hex 출력
@@ -552,7 +550,7 @@ async function validateFilesOnESP32() {
 
                 const fileUrl = BASE_URL + filePath;
                 //await testSingleFileTransfer2(fileUrl, filePath);
-                testSingleFileTransfer3(fileUrl, filePath);
+                await testSingleFileTransfer3(fileUrl, filePath);
                 await new Promise(resolve => setTimeout(resolve, 500));
 
 
