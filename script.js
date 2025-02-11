@@ -48,26 +48,13 @@ const MAX_RETRIES = 3; // 최대 재전송 횟수
 
 
 async function testSingleFileTransfer2(fileUrl, filePath) 
-{
-   // console.log("✅ ver 9");
-    // await connectSerial(); // ESP32 연결
-
-    // const fileList = await loadFileList();
-    // if (fileList.length === 0) {
-    //     console.log("❌ 전송할 파일이 없습니다.");
-    //     return;
-    // }
-
-    //const fileUrl = BASE_URL + fileList[0]; // 첫 번째 파일 가져오기
-    //const filePath = fileList[0]; // 상대 경로 유지
-
+{ 
     await new Promise(resolve => setTimeout(resolve, 100));
 
     console.log(`🚀 전송 시작: ${filePath}`);
 
     let retryCount = 0;
     let success = false;
-
 
     await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
     // console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
@@ -81,7 +68,6 @@ async function testSingleFileTransfer2(fileUrl, filePath)
 
     while (retryCount < MAX_RETRIES && !success) 
     {      
-
         if (retryCount > 0) 
         {
             console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES}`);
@@ -391,7 +377,7 @@ async function validateFilesOnESP32() {
             await new Promise(resolve => setTimeout(resolve, 100));
           
 
-            console.log(`❓ 검증 ACK 대기중`);
+            console.log(`❓ ${send_file_index} 검증 ACK 대기중`);
             
             // 3. ESP32가 MD5 체크섬 반환
             const { value } = await reader.read();
@@ -402,22 +388,11 @@ async function validateFilesOnESP32() {
 
             if (esp32Checksum === "ERROR") 
             {
-                console.warn(`❌ ${send_file_index} 검증 실패: ${filePath}`);
+                console.warn(`❌ 검증 실패: ${filePath}`);
                 //failedFiles.push(filePath);
                 await new Promise(resolve => setTimeout(resolve, 100));
 
-                // await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
-                // console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
-                // await new Promise(resolve => setTimeout(resolve, 100));
-
-                // await writer.write(new Uint8Array(1));
-                // console.log(`✔️ 전송 성공: 1 개의 파일`); // 파일 갯수
-                // await new Promise(resolve => setTimeout(resolve, 100));
-
                 const fileUrl = BASE_URL + filePath;
-                //await sendFileToESP32(fileUrl, filePath, 0, 1); // 파일 전송
-                //testSingleFileTransfer
-                //await testSingleFileTransfer2(fileUrl, filePath, 0, 1);
                 await testSingleFileTransfer2(fileUrl, filePath);
                 await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -426,13 +401,12 @@ async function validateFilesOnESP32() {
                 await new Promise(resolve => setTimeout(resolve, 100));
         
                 await writer.write(new Uint8Array(new Uint32Array([fileList.length - send_file_index]).buffer)); // 0. 파일 개수 전송
-                console.log(`✔️ ${send_file_index} 남은 갯수: ${fileList.length - send_file_index}개의 파일`);
-                await new Promise(resolve => setTimeout(resolve, 100));               
-              
+                console.log(`✔️ ${send_file_index} 남은 갯수: ${fileList.length - send_file_index}개`);
+                await new Promise(resolve => setTimeout(resolve, 100));       
             } 
             else 
             {
-                console.log(`✅ ${send_file_index} 검증 성공: ${filePath}`);
+                console.log(`✅ 검증 성공: ${filePath}`);
             }
 
 
