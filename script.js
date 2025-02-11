@@ -42,7 +42,7 @@ async function loadFileList() {
 const BUFFER_SIZE = 64; // 버퍼 크기 설정
 
 async function testSingleFileTransfer() {
-    console.log("✅ ver 18");
+    console.log("✅ ver 19");
     await connectSerial(); // ESP32 연결
 
     const fileList = await loadFileList();
@@ -127,17 +127,17 @@ async function testSingleFileTransfer() {
 
     console.log("받은 값:", hexValue);  // value 값 출력
 
-    if (hexValue === "\xe1") {
+    if (hexValue === "e1") {
         console.log("✔️ 전송 성공");
         return true;
     } 
     else 
     {
-        if (hexValue === "\xe2")
+        if (hexValue === "e2")
         {
             console.log("❌ 파일 바이트 부족");
         }
-        else if (hexValue === "\xe3")
+        else if (hexValue === "e3")
         {   
             console.log("❌ 파일 바이트 다름");
         }
@@ -148,57 +148,6 @@ async function testSingleFileTransfer() {
 
 
 
-
-// async function testSingleFileTransfer() {
-//     console.log("✅ ver 13");
-//     await connectSerial(); // ESP32 연결
-
-//     const fileList = await loadFileList();
-//     if (fileList.length === 0) {
-//         console.log("❌ 전송할 파일이 없습니다.");
-//         return;
-//     }
-
-
-//     const fileUrl = fileList[0]; // 첫 번째 파일 가져오기
-//     const filePath = fileUrl.replace(BASE_URL, ""); // 상대 경로 추출
-
-//     console.log(`🚀 테스트 전송 시작: ${filePath}`);
-//     console.log(`🚀 url: ${fileUrl}`);
-//     console.log(`🚀 file: ${filePath}`);
-
-//     await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
-//     console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
-//     await new Promise(resolve => setTimeout(resolve, 100));
-
-//     await writer.write(new Uint8Array([0x01]));
-//     console.log(`✔️ 전송 성공: 1 개의 파일`); // 파일 갯수
-//     await new Promise(resolve => setTimeout(resolve, 100));
-
-//     // 파일 경로 길이
-//     await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
-//     console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
-//     await new Promise(resolve => setTimeout(resolve, 100));
-
-//     // 파일 경로 데이터 전송
-//     await writer.write(new TextEncoder().encode(filePath));
-//     console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
-//     await new Promise(resolve => setTimeout(resolve, 100));
-
-
-//     // 파일 크기 전송 (4바이트)
-//     const response = await fetch(fileUrl);
-//     const fileData = await response.arrayBuffer();
-//     const fileSize = fileData.byteLength;
-
-//     await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
-//     console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
-//     await new Promise(resolve => setTimeout(resolve, 100));
-
-
-//     await sendFileToESP32(fileUrl, filePath, 0, 1); // 첫 번째 파일만 전송
-//     console.log(`🎉 테스트 전송 완료: ${filePath}`);
-// }
 
 async function sendFileToESP32(fileUrl, relativePath, index, totalFiles) 
 {
