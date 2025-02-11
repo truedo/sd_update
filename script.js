@@ -42,7 +42,7 @@ async function loadFileList() {
 const BUFFER_SIZE = 64; // 버퍼 크기 설정
 
 async function testSingleFileTransfer() {
-    console.log("✅ ver 19");
+    console.log("✅ ver 20");
     await connectSerial(); // ESP32 연결
 
     const fileList = await loadFileList();
@@ -122,28 +122,27 @@ async function testSingleFileTransfer() {
 
     // ESP32로부터 ACK 수신
     const { value } = await reader.read();
+    console.log("받은 값:", value, " (16진수로 변환: 0x" + value.toString(16) + ")");
 
-    const hexValue = value.toString(16);
-
-    console.log("받은 값:", hexValue);  // value 값 출력
-
-    if (hexValue === "e1") {
+    // 받은 값을 직접 비교
+    if (value === 0xe1) {
         console.log("✔️ 전송 성공");
         return true;
     } 
     else 
     {
-        if (hexValue === "e2")
+        if (value === 0xe2)
         {
             console.log("❌ 파일 바이트 부족");
         }
-        else if (hexValue === "e3")
+        else if (value === 0xe3)
         {   
             console.log("❌ 파일 바이트 다름");
         }
         console.warn("❌ 전송 실패, 다시 시도");
         return false;
     }
+
 }
 
 
