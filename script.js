@@ -122,6 +122,9 @@ async function testSingleFileTransfer() {
 
     // ESP32로부터 ACK 수신
     const { value } = await reader.read();
+
+    console.log("받은 값:", value);  // value 값 출력
+
     if (value === "\xe1") {
         console.log("✔️ 전송 성공");
         return true;
