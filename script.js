@@ -123,25 +123,27 @@ async function testSingleFileTransfer() {
     // ESP32로부터 ACK 수신
     const { value } = await reader.read();
 
-    const receivedCode = value.charCodeAt(0); // 실제 수신된 코드값 추출
+    //const receivedCode = value.charCodeAt(0); // 실제 수신된 코드값 추출
+    
+    const receivedByte = value[0]; 
+    console.log("받은 값:", receivedByte);  // value 값 출력
 
-    console.log("받은 값:", receivedCode);  // value 값 출력
-
-    if (receivedCode  === 0xe1) {
-        console.log("✔️ 전송 성공");
-        return true;
+    if (receivedByte === 0xE1) { 
+      console.log("✔️ 전송 성공");
+      return true;
     } 
     else 
     {
-        if (receivedCode  === 0xe2)
+        if (receivedByte === 0xE2) 
         {
             console.log("❌ 파일 바이트 부족");
-        }
-        else if (receivedCode  ===  0xe3)
-        {   
+        } 
+        else if (receivedByte === 0xE3) 
+        {
             console.log("❌ 파일 바이트 다름");
-        }
-        console.warn("❌ 전송 실패, 다시 시도");
+        } 
+        
+        console.warn("❌ 알 수 없는 에러 코드:", receivedByte);
         return false;
     }
 }
