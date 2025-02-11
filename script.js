@@ -195,8 +195,8 @@ async function testSingleFileTransfer3(fileUrl, filePath)
     await new Promise(resolve => setTimeout(resolve, 100));
 
 
-           // 테스트 대기
-           await new Promise(resolve => setTimeout(resolve, 10000));
+    // 테스트 대기
+    await new Promise(resolve => setTimeout(resolve, 10000));
 
 
 
@@ -206,8 +206,8 @@ async function testSingleFileTransfer3(fileUrl, filePath)
     await new Promise(resolve => setTimeout(resolve, 100));
 
 
-           // 테스트 대기
-           await new Promise(resolve => setTimeout(resolve, 10000));
+    // 테스트 대기
+    await new Promise(resolve => setTimeout(resolve, 10000));
 
 
 
@@ -223,10 +223,18 @@ async function testSingleFileTransfer3(fileUrl, filePath)
         console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
         await new Promise(resolve => setTimeout(resolve, 100));
 
+    // 테스트 대기
+    await new Promise(resolve => setTimeout(resolve, 10000));
+
+
         // 파일 경로 데이터 전송
         await writer.write(new TextEncoder().encode(filePath));
         console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
         await new Promise(resolve => setTimeout(resolve, 100));
+
+    // 테스트 대기
+    await new Promise(resolve => setTimeout(resolve, 10000));
+
 
         // 📌 파일 크기 확인 (서버 Content-Length)
         const response = await fetch(fileUrl);
@@ -253,6 +261,11 @@ async function testSingleFileTransfer3(fileUrl, filePath)
         await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
         console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
         await new Promise(resolve => setTimeout(resolve, 100));
+
+
+    // 테스트 대기
+    await new Promise(resolve => setTimeout(resolve, 10000));
+
 
         // 📌 파일 데이터 전송 (256 바이트씩 나누어 전송)
         let totalSent = 0;
@@ -537,11 +550,13 @@ async function validateFilesOnESP32() {
 
      
 
-
                 const fileUrl = BASE_URL + filePath;
                 //await testSingleFileTransfer2(fileUrl, filePath);
                 testSingleFileTransfer3(fileUrl, filePath);
                 await new Promise(resolve => setTimeout(resolve, 500));
+
+
+
 
                 await writer.write(new Uint8Array([0xcc]));   // 검증 모드 신호
                // console.log("✔️ 전송 성공 [0xCC] 검증 시작 바이트");
