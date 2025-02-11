@@ -77,6 +77,15 @@ async function testSingleFileTransfer() {
     await new Promise(resolve => setTimeout(resolve, 100));
 
 
+    // 파일 크기 전송 (4바이트)
+    const response = await fetch(fileUrl);
+    const fileData = await response.arrayBuffer();
+    const fileSize = fileData.byteLength;
+
+    await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
+    console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
+    await new Promise(resolve => setTimeout(resolve, 100));
+
 
     await sendFileToESP32(fileUrl, filePath, 0, 1); // 첫 번째 파일만 전송
     console.log(`🎉 테스트 전송 완료: ${filePath}`);
