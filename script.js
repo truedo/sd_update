@@ -254,8 +254,8 @@ async function testSingleFileTransfer3(fileUrl, filePath)
             totalSent += chunk.length;
 
             // 진행률 표시
-            const percent = Math.round((totalSent / fileSize) * 100);
-            console.log(`📊 진행률: ${percent}% (${totalSent}/${fileSize} bytes)`);
+           // const percent = Math.round((totalSent / fileSize) * 100);
+           // console.log(`📊 진행률: ${percent}% (${totalSent}/${fileSize} bytes)`);
         }
 
         console.log(`✅ 전송 완료: ${filePath}`);
@@ -522,6 +522,10 @@ async function validateFilesOnESP32() {
                 console.warn(`❌ 검증 실패: ${filePath}`);
                 //failedFiles.push(filePath);
                 await new Promise(resolve => setTimeout(resolve, 500));
+
+                // 테스트 대기
+                await new Promise(resolve => setTimeout(resolve, 10000));
+
 
                 const fileUrl = BASE_URL + filePath;
                 //await testSingleFileTransfer2(fileUrl, filePath);
