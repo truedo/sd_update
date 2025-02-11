@@ -50,7 +50,7 @@ async function loadFileList() {
 
 async function testSingleFileTransfer2(fileUrl, filePath) 
 { 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     console.log(`🚀 전송 시작: ${filePath}`);
 
@@ -59,12 +59,12 @@ async function testSingleFileTransfer2(fileUrl, filePath)
 
     await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
     // console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     //await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
     await writer.write(new Uint32Array([0x01])); // 파일 개수 전송 (1개)
     // console.log(`✔️ 전송 성공: 1 개의 파일`);
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 300));
 
 
     while (retryCount < MAX_RETRIES_SEND && !success) 
@@ -179,8 +179,8 @@ async function testSingleFileTransfer()
         return;
     }
 
-    const fileUrl = BASE_URL + fileList[0]; // 첫 번째 파일 가져오기
-    const filePath = fileList[0]; // 상대 경로 유지
+    const fileUrl = BASE_URL + fileList[10]; // 첫 번째 파일 가져오기
+    const filePath = fileList[10]; // 상대 경로 유지
 
     console.log(`🚀 테스트 전송 시작: ${filePath}`);
 
