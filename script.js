@@ -94,9 +94,41 @@ async function testSingleFileTransfer() {
     await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
     console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
 
-    // 파일 데이터 전송
-    await sendFileToESP32(fileUrl, filePath, 0, 1);
-    console.log(`🎉 테스트 전송 완료: ${filePath}`);
+    // // 파일 데이터 전송
+    // await sendFileToESP32(fileUrl, filePath, 0, 1);
+    // console.log(`🎉 테스트 전송 완료: ${filePath}`);
+
+
+    //  파일 데이터 전송
+    await writer.write(new Uint8Array(fileData));
+    console.log(`✔️ 데이터 전송 시작`);
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    console.log(`✅ 전송 완료: ${filePath}`);
+
+    // 5. ESP32로부터 ACK 수신
+    const { value } = await reader.read();
+    if (value === "\xe1") {
+        console.log("✔️ 전송 성공");
+      //  updateProgress(index + 1, totalFiles, `✅ 완료: ${filePath}`);
+        return true;
+    } else {
+        console.warn("❌ 전송 실패, 다시 시도");
+      //  updateProgress(index, totalFiles, `⚠️ 실패: ${filePath}`);
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 // async function testSingleFileTransfer() {
