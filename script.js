@@ -77,12 +77,12 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         // 파일 경로 길이 전송
         await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
       //  console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 300));
 
         // 파일 경로 데이터 전송
         await writer.write(new TextEncoder().encode(filePath));
       //  console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 300));
 
         // 📌 파일 크기 확인 (서버 Content-Length)
         const response = await fetch(fileUrl);
@@ -109,7 +109,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         // 파일 크기 전송 (4바이트)
         await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
        // console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 300));
 
         // 📌 파일 데이터 전송 (256 바이트씩 나누어 전송)
         let totalSent = 0;
@@ -385,11 +385,13 @@ async function validateFilesOnESP32() {
             const { value } = await reader.read();
             const esp32Checksum = new TextDecoder().decode(value).trim();
 
-            console.log(`📩 받은 ACK: ${esp32Checksum}`); // hex 출력
+
 
 
             if (esp32Checksum === "ERROR") 
             {
+                console.log(`📩 받은 ACK: ${esp32Checksum}`); // hex 출력
+
                 console.warn(`❌ 검증 실패: ${filePath}`);
                 //failedFiles.push(filePath);
                 await new Promise(resolve => setTimeout(resolve, 300));
@@ -408,6 +410,9 @@ async function validateFilesOnESP32() {
             } 
             else 
             {
+                const receivedByte = value[0]; 
+                console.log(`📩 받은 ACK: 0x${receivedByte.toString(16).toUpperCase()}`); // hex 출력
+
                 console.log(`✅ 검증 성공: ${filePath}`);
             }
 
