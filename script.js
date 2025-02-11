@@ -64,20 +64,22 @@ async function testSingleFileTransfer2(fileUrl, filePath)
     let retryCount = 0;
     let success = false;
 
+
+    await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
+    // console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
+    // console.log(`✔️ 전송 성공: 1 개의 파일`);
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+
     while (retryCount < MAX_RETRIES && !success) 
     {
         if (retryCount > 0) 
         {
             console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES}`);
         }
-
-        await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
-       // console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
-       // console.log(`✔️ 전송 성공: 1 개의 파일`);
-        await new Promise(resolve => setTimeout(resolve, 100));
 
         // 파일 경로 길이 전송
         await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
@@ -138,7 +140,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         const { value } = await reader.read();
         const receivedByte = value[0]; 
 
-       // console.log(`📩 받은 ACK: 0x${receivedByte.toString(16).toUpperCase()}`); // hex 출력
+        console.log(`📩 받은 ACK: 0x${receivedByte.toString(16).toUpperCase()}`); // hex 출력
 
         if (receivedByte === 0xE1) 
         { 
@@ -189,6 +191,15 @@ async function testSingleFileTransfer()
     let retryCount = 0;
     let success = false;
 
+    await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
+    console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
+    console.log(`✔️ 전송 성공: 1 개의 파일`);
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+
     while (retryCount < MAX_RETRIES && !success) 
     {
         if (retryCount > 0) 
@@ -196,13 +207,6 @@ async function testSingleFileTransfer()
             console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES}`);
         }
 
-        await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
-        console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
-        console.log(`✔️ 전송 성공: 1 개의 파일`);
-        await new Promise(resolve => setTimeout(resolve, 100));
 
         // 파일 경로 길이 전송
         await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
@@ -436,7 +440,7 @@ async function validateFilesOnESP32() {
 
 
 async function startTransfer() {
-    console.log("✅ ver 11");
+    console.log("✅ ver 12");
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
