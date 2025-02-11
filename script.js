@@ -11,6 +11,10 @@ const TIMEOUT = 3000; // ms
 
 const VERSION_JS = '1.0.0'; 
 
+const BUFFER_SIZE = 32; // 버퍼 크기 설정
+const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
+
+
 
 async function connectSerial() {
     try {        
@@ -20,9 +24,9 @@ async function connectSerial() {
         writer = port.writable.getWriter();
         reader = port.readable.getReader();
 
-        console.log("✅ ESP32 연결 성공!");
+        console.log("✅ 주미 미니 연결 성공!");
     } catch (error) {
-        console.error("❌ ESP32 연결 실패:", error);
+        console.error("❌ 주미 미니 연결 실패:", error);
     }
 }
 
@@ -42,9 +46,6 @@ async function loadFileList() {
         return [];
     }
 }
-
-const BUFFER_SIZE = 32; // 버퍼 크기 설정
-const MAX_RETRIES = 3; // 최대 재전송 횟수
 
 
 async function testSingleFileTransfer2(fileUrl, filePath) 
@@ -66,11 +67,11 @@ async function testSingleFileTransfer2(fileUrl, filePath)
     await new Promise(resolve => setTimeout(resolve, 100));
 
 
-    while (retryCount < MAX_RETRIES && !success) 
+    while (retryCount < MAX_RETRIES_SEND && !success) 
     {      
         if (retryCount > 0) 
         {
-            console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES}`);
+            console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES_SEND}`);
         }
 
         // 파일 경로 길이 전송
@@ -196,11 +197,11 @@ async function testSingleFileTransfer()
     await new Promise(resolve => setTimeout(resolve, 100));
 
 
-    while (retryCount < MAX_RETRIES && !success) 
+    while (retryCount < MAX_RETRIES_SEND && !success) 
     {
         if (retryCount > 0) 
         {
-            console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES}`);
+            console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES_SEND}`);
         }
 
 
@@ -424,7 +425,7 @@ async function validateFilesOnESP32() {
 }
 
 async function startTransfer() {
-    console.log(`ver ${version}`);
+    console.log(`ver ${VERSION_JS}`);
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
