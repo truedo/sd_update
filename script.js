@@ -138,7 +138,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
           //  console.log(`📊 진행률: ${percent}% (${totalSent}/${fileSize} bytes)`);
         }
 
-        c//onsole.log(`✅ 전송 완료: ${filePath}`);
+        //console.log(`✅ 전송 완료: ${filePath}`);
 
         // ESP32로부터 ACK 수신
         const { value } = await reader.read();
@@ -174,11 +174,9 @@ async function testSingleFileTransfer2(fileUrl, filePath)
     }
 }
 
-
-
 async function testSingleFileTransfer() 
 {
-    console.log("✅ ver 8");
+    console.log("✅ ver 9");
     await connectSerial(); // ESP32 연결
 
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -302,7 +300,6 @@ async function testSingleFileTransfer()
     }
 }
 
-
 async function sendFileToESP32(fileUrl, relativePath, index, totalFiles) 
 {
     try {
@@ -397,7 +394,7 @@ async function validateFilesOnESP32() {
 
             if (esp32Checksum === "ERROR") 
             {
-                console.warn(`❌ 검증 실패: ${filePath}`);
+                console.warn(`❌ ${send_file_index} 검증 실패: ${filePath}`);
                 //failedFiles.push(filePath);
                 await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -421,7 +418,7 @@ async function validateFilesOnESP32() {
                 await new Promise(resolve => setTimeout(resolve, 100));
         
                 await writer.write(new Uint8Array(new Uint32Array([fileList.length - send_file_index]).buffer)); // 0. 파일 개수 전송
-                console.log(`✔️ 전송 성공: ${fileList.length - send_file_index}개의 파일`);
+                console.log(`✔️ ${send_file_index} 전송 성공: ${fileList.length - send_file_index}개의 파일`);
                 await new Promise(resolve => setTimeout(resolve, 100));                
               
             } 
@@ -444,7 +441,6 @@ async function validateFilesOnESP32() {
         return [];
     }
 }
-
 
 async function startTransfer() {
     console.log("✅ ver 12");
