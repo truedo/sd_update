@@ -41,12 +41,12 @@ async function loadFileList() {
 }
 
 
-const BUFFER_SIZE = 128; // 버퍼 크기 설정
+const BUFFER_SIZE = 64; // 버퍼 크기 설정
 const MAX_RETRIES = 3; // 최대 재전송 횟수
 
 async function testSingleFileTransfer() 
 {
-    console.log("✅ ver 7");
+    console.log("✅ ver 8");
     await connectSerial(); // ESP32 연결
 
     const fileList = await loadFileList();
