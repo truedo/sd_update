@@ -73,14 +73,14 @@ async function testSingleFileTransfer2(fileUrl, filePath)
     // console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
+    //await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
+    await writer.write(new Uint32Array([0x01])); // 파일 개수 전송 (1개)
     // console.log(`✔️ 전송 성공: 1 개의 파일`);
     await new Promise(resolve => setTimeout(resolve, 100));
 
 
     while (retryCount < MAX_RETRIES && !success) 
-    {
-       
+    {      
 
         if (retryCount > 0) 
         {
@@ -449,7 +449,7 @@ async function validateFilesOnESP32() {
 }
 
 async function startTransfer() {
-    console.log("✅ ver 14");
+    console.log("✅ ver 15");
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
