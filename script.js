@@ -43,7 +43,7 @@ const BUFFER_SIZE = 64; // 버퍼 크기 설정
 
 async function testSingleFileTransfer() 
 {
-    console.log("✅ ver 4");
+    console.log("✅ ver 5");
     await connectSerial(); // ESP32 연결
 
     const fileList = await loadFileList();
@@ -125,8 +125,9 @@ async function testSingleFileTransfer()
     const { value } = await reader.read();
     
     const receivedByte = value[0]; 
+
     console.log("받은 값:", receivedByte);  // value 값 출력
-    console.log("받은 값:", value, " (16진수로 변환: 0x" + value.toString(16) + ")");
+    console.log(`받은 값: 0x${receivedByte.toString(16).toUpperCase()}`); // hex 출력
 
     if (receivedByte === 0xE1) { 
       console.log("✔️ 전송 성공");
