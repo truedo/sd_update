@@ -39,9 +39,10 @@ async function loadFileList() {
         return [];
     }
 }
+const BUFFER_SIZE = 64; // 버퍼 크기 설정
 
 async function testSingleFileTransfer() {
-    console.log("✅ ver 14");
+    console.log("✅ ver 15");
     await connectSerial(); // ESP32 연결
 
     const fileList = await loadFileList();
@@ -94,15 +95,20 @@ async function testSingleFileTransfer() {
     await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
     console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
 
-    // // 파일 데이터 전송
-    // await sendFileToESP32(fileUrl, filePath, 0, 1);
-    // console.log(`🎉 테스트 전송 완료: ${filePath}`);
+    // 📌 파일 데이터 전송 (256 바이트씩 나누어 전송)
+    let totalSent = 0;
+    const fileArray = new Uint8Array(fileData);
 
+    console.log(`📤 파일 전송 시작: ${filePath}`);
+    for (let i = 0; i < fileSize; i += BUFFER_SIZE) {
+        const chunk = fileArray.slice(i, i + BUFFER_SIZE);
+        await writer.write(chunk);
+        totalSent += chunk.length;
 
-    //  파일 데이터 전송
-    await writer.write(new Uint8Array(fileData));
-    console.log(`✔️ 데이터 전송 시작`);
-    await new Promise(resolve => setTimeout(resolve, 100));
+        // 진행률 표시
+        const percent = Math.round((totalSent / fileSize) * 100);
+        console.log(`📊 진행률: ${percent}% (${totalSent}/${fileSize} bytes)`);
+    }
 
     console.log(`✅ 전송 완료: ${filePath}`);
 
@@ -110,26 +116,15 @@ async function testSingleFileTransfer() {
     const { value } = await reader.read();
     if (value === "\xe1") {
         console.log("✔️ 전송 성공");
-      //  updateProgress(index + 1, totalFiles, `✅ 완료: ${filePath}`);
         return true;
     } else {
         console.warn("❌ 전송 실패, 다시 시도");
-      //  updateProgress(index, totalFiles, `⚠️ 실패: ${filePath}`);
         return false;
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }
+
+
+
 
 // async function testSingleFileTransfer() {
 //     console.log("✅ ver 13");
