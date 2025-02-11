@@ -9,7 +9,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.0'; 
+const VERSION_JS = '1.0.1'; 
 
 const BUFFER_SIZE = 32; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
@@ -370,12 +370,12 @@ async function validateFilesOnESP32() {
             // 1. 파일 경로 길이 전송
             await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
            // console.log(`✔️ ${send_file_index} 전송 성공: ${filePath.length} 파일 길이`);
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 300));
 
             // 2. 파일 경로 데이터 전송
             await writer.write(new TextEncoder().encode(filePath));
           //  console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 300));
 
 
           
@@ -392,19 +392,19 @@ async function validateFilesOnESP32() {
             {
                 console.warn(`❌ 검증 실패: ${filePath}`);
                 //failedFiles.push(filePath);
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 300));
 
                 const fileUrl = BASE_URL + filePath;
                 await testSingleFileTransfer2(fileUrl, filePath);
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 300));
 
                 await writer.write(new Uint8Array([0xcc]));   // 검증 모드 신호
                // console.log("✔️ 전송 성공 [0xCC] 검증 시작 바이트");
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 300));
         
                 await writer.write(new Uint8Array(new Uint32Array([fileList.length - send_file_index]).buffer)); // 0. 파일 개수 전송
                 console.log(`✔️ ${send_file_index} 남은 갯수: ${fileList.length - send_file_index}개`);
-                await new Promise(resolve => setTimeout(resolve, 100));       
+                await new Promise(resolve => setTimeout(resolve, 300));       
             } 
             else 
             {
@@ -414,7 +414,7 @@ async function validateFilesOnESP32() {
 
             
             // 짧은 지연 시간 추가 (예: 100밀리초)
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 300));
         }
 
     //     return failedFiles;
