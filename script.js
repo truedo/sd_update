@@ -41,7 +41,7 @@ async function loadFileList() {
 }
 
 async function testSingleFileTransfer() {
-    console.log("✅ ver 13");
+    console.log("✅ ver 14");
     await connectSerial(); // ESP32 연결
 
     const fileList = await loadFileList();
@@ -50,35 +50,33 @@ async function testSingleFileTransfer() {
         return;
     }
 
-    const fileUrl = fileList[0]; // 첫 번째 파일 가져오기
-    const filePath = fileUrl.replace(BASE_URL, ""); // 상대 경로 추출
+    const fileUrl = BASE_URL + fileList[0]; // 첫 번째 파일 가져오기
+    const filePath = fileList[0]; // 상대 경로 유지
 
     console.log(`🚀 테스트 전송 시작: ${filePath}`);
 
     await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
     console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
-    await new Promise(resolve => setTimeout(resolve, 100));
 
     await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
     console.log(`✔️ 전송 성공: 1 개의 파일`);
-    await new Promise(resolve => setTimeout(resolve, 100));
-
 
     // 파일 경로 길이 전송
     await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
     console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
-    await new Promise(resolve => setTimeout(resolve, 100));
 
     // 파일 경로 데이터 전송
     await writer.write(new TextEncoder().encode(filePath));
     console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
-    await new Promise(resolve => setTimeout(resolve, 100));
-
 
     // 📌 파일 크기 확인 (서버 Content-Length)
     const response = await fetch(fileUrl);
-    const contentLength = response.headers.get("Content-Length");
+    if (!response.ok) {
+        console.error(`❌ 파일 다운로드 실패: ${fileUrl}`);
+        return;
+    }
 
+    const contentLength = response.headers.get("Content-Length");
     if (contentLength) {
         console.log(`📏 서버 제공 파일 크기: ${contentLength} bytes`);
     }
@@ -100,7 +98,6 @@ async function testSingleFileTransfer() {
     await sendFileToESP32(fileUrl, filePath, 0, 1);
     console.log(`🎉 테스트 전송 완료: ${filePath}`);
 }
-
 
 // async function testSingleFileTransfer() {
 //     console.log("✅ ver 13");
