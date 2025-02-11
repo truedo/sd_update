@@ -72,21 +72,21 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         }
 
         await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
-        console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
+       // console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
         await new Promise(resolve => setTimeout(resolve, 100));
 
         await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
-        console.log(`✔️ 전송 성공: 1 개의 파일`);
+       // console.log(`✔️ 전송 성공: 1 개의 파일`);
         await new Promise(resolve => setTimeout(resolve, 100));
 
         // 파일 경로 길이 전송
         await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
-        console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
+      //  console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
         await new Promise(resolve => setTimeout(resolve, 100));
 
         // 파일 경로 데이터 전송
         await writer.write(new TextEncoder().encode(filePath));
-        console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
+      //  console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
         await new Promise(resolve => setTimeout(resolve, 100));
 
         // 📌 파일 크기 확인 (서버 Content-Length)
@@ -105,14 +105,15 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         const fileSize = fileData.byteLength;
 
         console.log(`📥 다운로드한 파일 크기: ${fileSize} bytes`);
-        if (contentLength && fileSize !== parseInt(contentLength)) {
+        if (contentLength && fileSize !== parseInt(contentLength)) 
+            {
             console.error("⚠️ 파일 크기 불일치! 네트워크 문제 가능성 있음.");
             return;
         }
 
         // 파일 크기 전송 (4바이트)
         await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
-        console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
+       // console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
         await new Promise(resolve => setTimeout(resolve, 100));
 
         // 📌 파일 데이터 전송 (256 바이트씩 나누어 전송)
@@ -123,7 +124,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         for (let i = 0; i < fileSize; i += BUFFER_SIZE) {
             const chunk = fileArray.slice(i, i + BUFFER_SIZE);
             await writer.write(chunk);
-            await new Promise(resolve => setTimeout(resolve, 1));
+            await new Promise(resolve => setTimeout(resolve, 10));
             totalSent += chunk.length;
 
             // 진행률 표시
@@ -143,7 +144,8 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         { 
             console.log("✔️ 전송 성공");
             success = true;
-        } else 
+        } 
+        else 
         {
             if (receivedByte === 0xE2) 
             {
@@ -161,7 +163,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         }
     }
     if (!success) 
-        {
+    {
         console.error("❌ 파일 전송 실패: 최대 재전송 횟수 초과");
     }
 }
@@ -347,7 +349,7 @@ async function validateFilesOnESP32() {
     try {  
         // 🔹 **검증 모드 신호 (0xCC) 정확하게 1바이트 전송**
         await writer.write(new Uint8Array([0xCC]));  
-        console.log("✔️ 전송 성공 [0xCC] 검증 시작 바이트");
+       // console.log("✔️ 전송 성공 [0xCC] 검증 시작 바이트");
         await new Promise(resolve => setTimeout(resolve, 100)); // 작은 지연
 
         const fileList = await loadFileList();
@@ -366,7 +368,7 @@ async function validateFilesOnESP32() {
 
             // 1. 파일 경로 길이 전송
             await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
-            console.log(`✔️ ${send_file_index} 전송 성공: ${filePath.length} 파일 길이`);
+           // console.log(`✔️ ${send_file_index} 전송 성공: ${filePath.length} 파일 길이`);
             await new Promise(resolve => setTimeout(resolve, 100));
 
 
@@ -404,7 +406,7 @@ async function validateFilesOnESP32() {
                 await new Promise(resolve => setTimeout(resolve, 100));
 
                 await writer.write(new Uint8Array([0xcc]));   // 검증 모드 신호
-                console.log("✔️ 전송 성공 [0xCC] 검증 시작 바이트");
+               // console.log("✔️ 전송 성공 [0xCC] 검증 시작 바이트");
                 await new Promise(resolve => setTimeout(resolve, 100));
         
                 await writer.write(new Uint8Array(new Uint32Array([fileList.length - send_file_index]).buffer)); // 0. 파일 개수 전송
@@ -434,7 +436,7 @@ async function validateFilesOnESP32() {
 
 
 async function startTransfer() {
-    console.log("✅ ver 8");
+    console.log("✅ ver 9");
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
