@@ -132,7 +132,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         for (let i = 0; i < fileSize; i += BUFFER_SIZE) {
             const chunk = fileArray.slice(i, i + BUFFER_SIZE);
             await writer.write(chunk);
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await new Promise(resolve => setTimeout(resolve, 1));
             totalSent += chunk.length;
 
             // 진행률 표시
@@ -389,7 +389,6 @@ async function validateFilesOnESP32() {
             await writer.write(new TextEncoder().encode(filePath));
           //  console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
             await new Promise(resolve => setTimeout(resolve, 100));
-
           
 
             console.log(`❓ 검증 ACK 대기중`);
@@ -397,6 +396,9 @@ async function validateFilesOnESP32() {
             // 3. ESP32가 MD5 체크섬 반환
             const { value } = await reader.read();
             const esp32Checksum = new TextDecoder().decode(value).trim();
+
+            console.log(`📩 받은 ACK: ${esp32Checksum}`); // hex 출력
+
 
             if (esp32Checksum === "ERROR") 
             {
@@ -434,9 +436,7 @@ async function validateFilesOnESP32() {
             }
 
 
-
-
-
+            
             // 짧은 지연 시간 추가 (예: 100밀리초)
             await new Promise(resolve => setTimeout(resolve, 100));
         }
@@ -449,7 +449,7 @@ async function validateFilesOnESP32() {
 }
 
 async function startTransfer() {
-    console.log("✅ ver 15");
+    console.log("✅ ver 17");
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
