@@ -127,8 +127,8 @@ async function testSingleFileTransfer2(fileUrl, filePath)
             totalSent += chunk.length;
 
             // 진행률 표시
-            const percent = Math.round((totalSent / fileSize) * 100);
-            console.log(`📊 진행률: ${percent}% (${totalSent}/${fileSize} bytes)`);
+          //  const percent = Math.round((totalSent / fileSize) * 100);
+          //  console.log(`📊 진행률: ${percent}% (${totalSent}/${fileSize} bytes)`);
         }
 
         console.log(`✅ 전송 완료: ${filePath}`);
@@ -434,7 +434,7 @@ async function validateFilesOnESP32() {
 
 
 async function startTransfer() {
-    console.log("✅ ver 7");
+    console.log("✅ ver 8");
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
