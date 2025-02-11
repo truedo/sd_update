@@ -86,8 +86,8 @@ async function testSingleFileTransfer2(fileUrl, filePath)
 
         // 📌 파일 크기 확인 (서버 Content-Length)
 
-        while(true)
-        {
+      //  while(true)
+      //  {
             const response = await fetch(fileUrl);
             if (!response.ok) {
                 console.error(`❌ 파일 다운로드 실패: ${fileUrl}`);
@@ -112,7 +112,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
                 break;
             }
 
-        }
+      //  }
 
         // 파일 크기 전송 (4바이트)
         await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
@@ -412,17 +412,14 @@ async function validateFilesOnESP32() {
                 }
                 else
                 {
+                    // 파일 크기 전송 (4바이트)
+                    await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
+                    // console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
                     break;
                 }
-
             }
-
-            // 파일 크기 전송 (4바이트)
-            await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
-            // console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
-            await new Promise(resolve => setTimeout(resolve, 300));
-
-
 
           
             console.log(`❓ ${send_file_index} 검증 ACK 대기중`);
