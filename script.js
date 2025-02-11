@@ -59,6 +59,8 @@ async function testSingleFileTransfer2(fileUrl, filePath)
     //const fileUrl = BASE_URL + fileList[0]; // 첫 번째 파일 가져오기
     //const filePath = fileList[0]; // 상대 경로 유지
 
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     console.log(`🚀 전송 시작: ${filePath}`);
 
     let retryCount = 0;
@@ -177,6 +179,8 @@ async function testSingleFileTransfer()
     console.log("✅ ver 8");
     await connectSerial(); // ESP32 연결
 
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     const fileList = await loadFileList();
     if (fileList.length === 0) {
         console.log("❌ 전송할 파일이 없습니다.");
@@ -190,6 +194,7 @@ async function testSingleFileTransfer()
 
     let retryCount = 0;
     let success = false;
+    
 
     await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
     console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
@@ -252,7 +257,7 @@ async function testSingleFileTransfer()
         for (let i = 0; i < fileSize; i += BUFFER_SIZE) {
             const chunk = fileArray.slice(i, i + BUFFER_SIZE);
             await writer.write(chunk);
-            await new Promise(resolve => setTimeout(resolve, 1));
+            await new Promise(resolve => setTimeout(resolve, 10));
             totalSent += chunk.length;
 
             // 진행률 표시
