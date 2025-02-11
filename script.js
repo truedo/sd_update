@@ -42,7 +42,7 @@ async function loadFileList() {
 const BUFFER_SIZE = 64; // 버퍼 크기 설정
 
 async function testSingleFileTransfer() {
-    console.log("✅ ver 17");
+    console.log("✅ ver 18");
     await connectSerial(); // ESP32 연결
 
     const fileList = await loadFileList();
@@ -127,17 +127,17 @@ async function testSingleFileTransfer() {
 
     console.log("받은 값:", hexValue);  // value 값 출력
 
-    if (value === "\xe1") {
+    if (hexValue === "\xe1") {
         console.log("✔️ 전송 성공");
         return true;
     } 
     else 
     {
-        if (value === "\xe2")
+        if (hexValue === "\xe2")
         {
             console.log("❌ 파일 바이트 부족");
         }
-        else if (value === "\xe3")
+        else if (hexValue === "\xe3")
         {   
             console.log("❌ 파일 바이트 다름");
         }
