@@ -47,14 +47,14 @@ const MAX_RETRIES = 3; // 최대 재전송 횟수
 
 async function testSingleFileTransfer2(fileUrl, filePath) 
 {
-    console.log("✅ ver 8");
-    await connectSerial(); // ESP32 연결
+    console.log("✅ ver 9");
+    // await connectSerial(); // ESP32 연결
 
-    const fileList = await loadFileList();
-    if (fileList.length === 0) {
-        console.log("❌ 전송할 파일이 없습니다.");
-        return;
-    }
+    // const fileList = await loadFileList();
+    // if (fileList.length === 0) {
+    //     console.log("❌ 전송할 파일이 없습니다.");
+    //     return;
+    // }
 
     //const fileUrl = BASE_URL + fileList[0]; // 첫 번째 파일 가져오기
     //const filePath = fileList[0]; // 상대 경로 유지
