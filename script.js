@@ -418,13 +418,13 @@ async function validateFilesOnESP32() {
                 await new Promise(resolve => setTimeout(resolve, 100));
         
                 await writer.write(new Uint8Array(new Uint32Array([fileList.length - send_file_index]).buffer)); // 0. 파일 개수 전송
-                console.log(`✔️ ${send_file_index} 전송 성공: ${fileList.length - send_file_index}개의 파일`);
-                await new Promise(resolve => setTimeout(resolve, 100));                
+               // console.log(`✔️ ${send_file_index} 전송 성공: ${fileList.length - send_file_index}개의 파일`);
+                await new Promise(resolve => setTimeout(resolve, 100));               
               
             } 
             else 
             {
-                console.log(`✅ 검증 성공: ${filePath}`);
+                console.log(`✅ ${send_file_index} 검증 성공: ${filePath}`);
             }
 
 
@@ -443,7 +443,7 @@ async function validateFilesOnESP32() {
 }
 
 async function startTransfer() {
-    console.log("✅ ver 12");
+    console.log("✅ ver 14");
     await connectSerial();
 
     console.log("🔍 파일 검증 중...");
