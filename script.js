@@ -9,6 +9,9 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
+const VERSION_JS = 3; // 최대 재전송 횟수
+
+
 async function connectSerial() {
     try {        
         port = await navigator.serial.requestPort();
@@ -40,8 +43,7 @@ async function loadFileList() {
     }
 }
 
-
-const BUFFER_SIZE = 64; // 버퍼 크기 설정
+const BUFFER_SIZE = 32; // 버퍼 크기 설정
 const MAX_RETRIES = 3; // 최대 재전송 횟수
 
 
@@ -136,7 +138,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
           //  console.log(`📊 진행률: ${percent}% (${totalSent}/${fileSize} bytes)`);
         }
 
-        console.log(`✅ 전송 완료: ${filePath}`);
+        c//onsole.log(`✅ 전송 완료: ${filePath}`);
 
         // ESP32로부터 ACK 수신
         const { value } = await reader.read();
@@ -383,7 +385,7 @@ async function validateFilesOnESP32() {
 
             // 2. 파일 경로 데이터 전송
             await writer.write(new TextEncoder().encode(filePath));
-            console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
+          //  console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
             await new Promise(resolve => setTimeout(resolve, 100));
 
           
