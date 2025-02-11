@@ -9,7 +9,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.3'; 
+const VERSION_JS = '1.0.4'; 
 
 const BUFFER_SIZE = 32; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
@@ -201,7 +201,8 @@ async function testSingleFileTransfer3(fileUrl, filePath)
 
 
 
-    await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
+   // await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
+    await writer.write(new Uint32Array([0x01])); // 파일 개수 전송 (1개)
     console.log(`✔️ 전송 성공: 1 개의 파일`);
     await new Promise(resolve => setTimeout(resolve, 100));
 
