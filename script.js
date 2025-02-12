@@ -1,7 +1,9 @@
-const GITHUB_USER = "truedo";
-const REPO_NAME = "sd_update";
-const BRANCH = "main";
-const BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${BRANCH}/sd_update_files/`;
+// const GITHUB_USER = "truedo";
+// const REPO_NAME = "sd_update";
+// const BRANCH = "main";
+// const BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${BRANCH}/sd_update_files/`;
+
+const BASE_URL = 'https://startling-tanuki-ea7c77.netlify.app/';
 
 let port;
 let writer;
@@ -9,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.10'; 
+const VERSION_JS = '1.0.11'; 
 
 const BUFFER_SIZE = 32; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
