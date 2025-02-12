@@ -461,3 +461,48 @@ function updateProgress(currentIndex, totalFiles, filePath)
         `📂 진행 중: ${currentIndex}/${totalFiles} 파일 완료 (${percent}%)\n` +
         `📝 현재 파일: ${filePath}`;
 }
+
+
+async function loadFileList2() {
+    try {
+        const response = await fetch("files.json"); // 🔹 파일 리스트 JSON 불러오기
+        if (!response.ok) throw new Error("파일 목록을 불러올 수 없습니다.");
+        
+        const fileList = await response.json();
+        const fileSelect = document.getElementById("fileList");
+
+        // 🔹 기존 옵션 초기화
+        fileSelect.innerHTML = "";
+        
+        fileList.forEach(file => {
+            const option = document.createElement("option");
+            option.value = file;
+            option.textContent = file;
+            fileSelect.appendChild(option);
+        });
+
+        fileSelect.disabled = false;
+    } catch (error) {
+        console.error("❌ 파일 목록 로드 실패:", error);
+    }
+}
+
+// 🔹 페이지 로드 시 파일 목록 불러오기
+document.addEventListener("DOMContentLoaded", loadFileList);
+
+
+document.getElementById("sendSelectedFile").addEventListener("click", async function() {
+    const fileSelect = document.getElementById("fileList");
+    const selectedFile = fileSelect.value;
+
+    if (!selectedFile) {
+        alert("전송할 파일을 선택하세요!");
+        return;
+    }
+
+    document.getElementById("selectedFileInfo").innerText = `📂 선택된 파일: ${selectedFile}`;
+
+    const fileUrl = BASE_URL + selectedFile;
+   // await sendFileToESP32(fileUrl, selectedFile, 0, 1); // 파일 전송 함수 실행
+    await SingleFileTransfer(fileUrl, selectedFile);
+});

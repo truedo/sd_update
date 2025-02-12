@@ -95,6 +95,16 @@
     <h2>파일 개별 전송</h2>
     <button onclick="testSingleFileTransfer()">테스트 전송 (첫 번째 파일)</button>
 
+    <label for="fileList">전송할 파일 선택: </label>
+    <select id="fileList">
+        <option value="" disabled selected>파일 목록을 불러오는 중...</option>
+    </select>
+    <button id="sendSelectedFile">선택한 파일 전송</button>
+    <p id="selectedFileInfo">현재 선택된 파일 없음</p>
+
+
+
+
     <script src="script.js"></script>
 
 </body>
