@@ -13,7 +13,8 @@ const TIMEOUT = 3000; // ms
 
 const VERSION_JS = '1.0.22'; 
 
-const BUFFER_SIZE = 64; // 버퍼 크기 설정
+let BUFFER_SIZE = 64; // 버퍼 크기 설정
+
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
 
 const SEND_TERM = 50; // 명령간의 텀
@@ -201,7 +202,8 @@ async function SingleFileTransfer(fileUrl, filePath)
 { 
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
-    console.log(`🚀 파일 전송 시작: ${filePath}`);
+    //console.log(`🚀 파일 전송 시작: ${filePath}`);
+    console.log(`🚀 파일 전송 시작: ${filePath} (버퍼 크기: ${BUFFER_SIZE} bytes)`);
 
     let retryCount = 0;
     let success = false;
@@ -421,6 +423,12 @@ async function startTransfer()
 
     console.log(`⏳ 총 소요 시간: ${minutes}분 ${seconds}초`);
 }
+
+// 🔹 버퍼 크기 선택 시 업데이트
+document.getElementById("bufferSize").addEventListener("change", function() {
+    BUFFER_SIZE = parseInt(this.value, 10); // 선택된 값 적용
+    document.getElementById("selectedBufferSize").innerText = `현재 설정된 버퍼 크기: ${BUFFER_SIZE} bytes`;
+});
 
 function updateProgress(currentIndex, totalFiles, filePath)
 {

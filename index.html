@@ -41,13 +41,12 @@
 
     <label for="bufferSize">버퍼 크기 선택: </label>
     <select id="bufferSize">
-        <option value="0">0 (자동)</option>
         <option value="32">32 bytes</option>
-        <option value="64">64 bytes</option>
+        <option value="64" selected>64 bytes</option>
         <option value="128">128 bytes</option>
-        <option value="256" selected>256 bytes</option>
+        <option value="256">256 bytes</option>
     </select>
-    <p id="selectedBufferSize">현재 설정된 버퍼 크기: 256 bytes</p>
+    <p id="selectedBufferSize">현재 설정된 버퍼 크기: 64 bytes</p>
 
     <!-- 진행 바 -->
     <div id="progressContainer">
