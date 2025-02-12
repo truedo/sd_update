@@ -442,7 +442,7 @@ document.getElementById("sendTerm").addEventListener("change", function() {
 // 🔹 파일데이터 텀 선택 시 업데이트
 document.getElementById("fileDataTerm").addEventListener("change", function() {
     FILEDATA_TERM = parseInt(this.value, 10); // 선택된 값 적용
-    document.getElementById("selectedfileDataTerm").innerText = `현재 설정된 파일데이터 텀: ${SEND_TERM} ms`;
+    document.getElementById("selectedfileDataTerm").innerText = `현재 설정된 파일데이터 텀: ${FILEDATA_TERM} ms`;
 });
 
 
@@ -504,7 +504,7 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
 
     console.log(`ver ${VERSION_JS}`);
     await connectSerial(); // ESP32 연결
-    
+
     const fileUrl = BASE_URL + selectedFile;
    // await sendFileToESP32(fileUrl, selectedFile, 0, 1); // 파일 전송 함수 실행
     await SingleFileTransfer(fileUrl, selectedFile);
