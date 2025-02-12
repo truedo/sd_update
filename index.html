@@ -31,12 +31,13 @@
     <h2>파일 개별 전송</h2>
     <button onclick="testSingleFileTransfer()">테스트 전송 (첫 번째 파일)</button>
 
-    <div id="progressBarContainer">
-        <div id="progressBar">0%</div>
+    <!-- 진행 바 -->
+    <div id="progressContainer" style="width: 100%; background-color: #ddd;">
+        <div id="progressBar" style="width: 0%; height: 20px; background-color: #4CAF50;"></div>
     </div>
-    <p id="progressText">전송 준비 중...</p>
 
-    <script src="script.js"></script>
+    <!-- 진행 상태 텍스트 -->
+    <p id="progressText">파일 검증 준비 중...</p>
 
 </body>
 </html>

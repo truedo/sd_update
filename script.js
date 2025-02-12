@@ -11,13 +11,13 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.21'; 
+const VERSION_JS = '1.0.22'; 
 
 const BUFFER_SIZE = 64; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
 
-const SEND_TERM = 50;
-const FILEDATA_TERM = 10;
+const SEND_TERM = 50; // 명령간의 텀
+const FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
 
 async function connectSerial() {
     try {        
@@ -265,7 +265,7 @@ async function SingleFileTransfer(fileUrl, filePath)
 
         //console.log(`✅ 전송 완료: ${filePath}`);
 
-        // 🔶 4. 전송 ACK 수신 1바이트
+        // 🔶 5. 전송 ACK 수신 1바이트
         console.log(`❓ 전송 ACK 대기중`);
 
         // ESP32로부터 ACK 수신
@@ -303,9 +303,6 @@ async function SingleFileTransfer(fileUrl, filePath)
     }
 }
 
-
-
-
 async function validateFilesOnESP32() 
 {     
     const fileList = await loadFileList();
@@ -325,6 +322,10 @@ async function validateFilesOnESP32()
     for (const filePath of fileList) 
     {            
         send_file_index += 1;
+
+        // 진행 상태 업데이트
+        updateProgress(send_file_index, totalFiles, filePath);
+
 
         // 🔶 1. 파일 경로 길이 전송
         await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
@@ -387,16 +388,14 @@ async function validateFilesOnESP32()
     
              // 🔷 파일 개수 전송 4바이트
             await writer.write(new Uint8Array(new Uint32Array([fileList.length - send_file_index]).buffer)); // 0. 파일 개수 전송
-            console.log(`✔️ ${send_file_index} 남은 갯수: ${fileList.length - send_file_index}개`);
-            await new Promise(resolve => setTimeout(resolve, SEND_TERM));       
+            console.log(`✔️ ${send_file_index} 남은 갯수: ${fileList.length - send_file_index}개`);      
         }           
         
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
     }   
+    // 전체 전송 완료 메시지 표시
+    updateProgress(totalFiles, totalFiles, "모든 파일 검증 완료 ✅");
 }
-
-
-
 
 async function startTransfer() 
 {
@@ -418,18 +417,14 @@ async function startTransfer()
     console.log(`⏳ 총 소요 시간: ${minutes}분 ${seconds}초`);
 }
 
-function updateProgress(current, total, message) 
-{
-    const progressBar = document.getElementById("progressBar");
-    const progressText = document.getElementById("progressText");
+function updateProgress(currentIndex, totalFiles, filePath) {
+    const percent = Math.round((currentIndex / totalFiles) * 100);
+    
+    // 진행 바 업데이트
+    document.getElementById("progressBar").style.width = percent + "%";
 
-    if (total === 0) {
-        progressBar.style.width = "0%";
-        progressText.innerText = "전송 준비 중...";
-        return;
-    }
-
-    const percent = Math.round((current / total) * 100);
-    progressBar.style.width = `${percent}%`;
-    progressText.innerText = `${message} (${percent}%)`;
+    // 진행 상태 텍스트 업데이트
+    document.getElementById("progressText").innerText =
+        `📂 진행 중: ${currentIndex}/${totalFiles} 파일 완료 (${percent}%)\n` +
+        `📝 현재 파일: ${filePath}`;
 }
