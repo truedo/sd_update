@@ -11,9 +11,9 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.18'; 
+const VERSION_JS = '1.0.19'; 
 
-const BUFFER_SIZE = 32; // 버퍼 크기 설정
+const BUFFER_SIZE = 64; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
 
 
