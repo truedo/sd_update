@@ -187,7 +187,7 @@ async function testSingleFileTransfer()
     await new Promise(resolve => setTimeout(resolve, 100));
 
     //await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
-    await writer.write(new Uint32Array([0x02])); // 파일 개수 전송 (1개)
+    await writer.write(new Uint32Array([0x01])); // 파일 개수 전송 (1개)
     // console.log(`✔️ 전송 성공: 1 개의 파일`);
     await new Promise(resolve => setTimeout(resolve, 100));
 
