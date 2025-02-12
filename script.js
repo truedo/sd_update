@@ -9,7 +9,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.9'; 
+const VERSION_JS = '1.0.10'; 
 
 const BUFFER_SIZE = 32; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
@@ -354,24 +354,34 @@ async function fetchFileWithRetry(url, retries = 3) {
     for (let attempt = 1; attempt <= retries; attempt++) {
         console.log(`📥 파일 다운로드 시도 ${attempt}/${retries}: ${url}`);
 
-        // 브라우저 캐시 방지 (항상 최신 데이터 요청)
+        // 브라우저 캐시 방지
         const uniqueUrl = `${url}?_=${new Date().getTime()}`;
         const response = await fetch(uniqueUrl, { cache: "no-store" });
 
         if (!response.ok) {
-            console.error(`❌ 파일 다운로드 실패 (시도 ${attempt}): HTTP ${response.status}`);
-            continue;
+            console.error(`❌ 파일 다운로드 실패 (시도 ${attempt}/${retries}): HTTP ${response.status}`);
+            continue; // 다음 재시도
         }
+
+        // Content-Encoding 확인 (압축 여부)
+        const encoding = response.headers.get("Content-Encoding");
+        const contentLength = response.headers.get("Content-Length");
 
         const fileData = await response.arrayBuffer();
         const fileSize = fileData.byteLength;
-        const contentLength = response.headers.get("Content-Length");
 
-        if (!contentLength || fileSize === parseInt(contentLength)) {
-            console.log(`✅ 파일 다운로드 성공: ${fileSize} bytes`);
+        if (encoding && (encoding === "gzip" || encoding === "br")) {
+            // 압축되어 있으면, Content-Length는 압축된 크기를 나타내므로 검증 건너뜀
+            console.log(`✅ 파일 다운로드 성공 (압축 해제됨): ${fileSize} bytes`);
             return fileData;
         } else {
-            console.warn(`⚠️ 파일 크기 불일치! (${fileSize} bytes vs ${contentLength} bytes)`);
+            // 압축이 적용되지 않은 경우, Content-Length와 실제 크기를 비교
+            if (!contentLength || fileSize === parseInt(contentLength)) {
+                console.log(`✅ 파일 다운로드 성공: ${fileSize} bytes`);
+                return fileData;
+            } else {
+                console.warn(`⚠️ 파일 크기 불일치! (${fileSize} bytes vs ${contentLength} bytes)`);
+            }
         }
     }
 
