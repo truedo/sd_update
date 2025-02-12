@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.12'; 
+const VERSION_JS = '1.0.11'; 
 
 const BUFFER_SIZE = 32; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
@@ -365,12 +365,26 @@ async function fetchFileWithRetry(url, retries = 3) {
             continue; // 다음 재시도
         }
 
-        // Content-Length 제거 (압축 문제 해결)
+        // Content-Encoding 확인 (압축 여부)
+        const encoding = response.headers.get("Content-Encoding");
+        const contentLength = response.headers.get("Content-Length");
+
         const fileData = await response.arrayBuffer();
         const fileSize = fileData.byteLength;
 
-        console.log(`✅ 파일 다운로드 성공: ${fileSize} bytes`);
-        return fileData;
+        if (encoding && (encoding === "gzip" || encoding === "br")) {
+            // 압축되어 있으면, Content-Length는 압축된 크기를 나타내므로 검증 건너뜀
+            console.log(`✅ 파일 다운로드 성공 (압축 해제됨): ${fileSize} bytes`);
+            return fileData;
+        } else {
+            // 압축이 적용되지 않은 경우, Content-Length와 실제 크기를 비교
+            if (!contentLength || fileSize === parseInt(contentLength)) {
+                console.log(`✅ 파일 다운로드 성공: ${fileSize} bytes`);
+                return fileData;
+            } else {
+                console.warn(`⚠️ 파일 크기 불일치! (${fileSize} bytes vs ${contentLength} bytes)`);
+            }
+        }
     }
 
     throw new Error("❌ 파일 다운로드 실패: 모든 재시도 실패");
