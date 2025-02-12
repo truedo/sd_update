@@ -15,10 +15,10 @@ const VERSION_JS = '1.0.22';
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
+let FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
 
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
 
-const FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
 
 
 
@@ -94,7 +94,7 @@ async function testSingleFileTransfer()
 
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    console.log(`🚀 테스트 파일 전송 시작: ${filePath}`);
+    console.log(`🚀 테스트 파일 전송 시작: ${filePath} (버퍼 크기: ${BUFFER_SIZE} bytes)`);
 
     let retryCount = 0;
     let success = false;
@@ -147,7 +147,8 @@ async function testSingleFileTransfer()
         let totalSent = 0;
         const fileArray = new Uint8Array(fileData);
 
-        console.log(`📤 파일 전송 시작: ${filePath}`);
+        //console.log(`📤 파일 전송 시작: ${filePath}`);
+        console.log(`📤 파일 전송 시작: ${filePath} (파일데이텀 텀: ${FILEDATA_TERM} ms)`);
         for (let i = 0; i < fileSize; i += BUFFER_SIZE) {
             const chunk = fileArray.slice(i, i + BUFFER_SIZE);
             await writer.write(chunk);
@@ -256,7 +257,7 @@ async function SingleFileTransfer(fileUrl, filePath)
         let totalSent = 0;
         const fileArray = new Uint8Array(fileData);
 
-        console.log(`📤 파일 전송 시작: ${filePath}`);
+        console.log(`📤 파일 전송 시작: ${filePath} (파일데이텀 텀: ${FILEDATA_TERM} ms)`);
         for (let i = 0; i < fileSize; i += BUFFER_SIZE) {
             const chunk = fileArray.slice(i, i + BUFFER_SIZE);
             await writer.write(chunk);
@@ -434,7 +435,14 @@ document.getElementById("bufferSize").addEventListener("change", function() {
 // 🔹 전송 텀 선택 시 업데이트
 document.getElementById("sendTerm").addEventListener("change", function() {
     SEND_TERM = parseInt(this.value, 10); // 선택된 값 적용
-    document.getElementById("selectedsendTerm").innerText = `현재 설정된 전송 텀: ${SEND_TERM} bytes`;
+    document.getElementById("selectedsendTerm").innerText = `현재 설정된 전송 텀: ${SEND_TERM} ms`;
+});
+
+
+// 🔹 파일데이터 텀 선택 시 업데이트
+document.getElementById("fileDataTerm").addEventListener("change", function() {
+    FILEDATA_TERM = parseInt(this.value, 10); // 선택된 값 적용
+    document.getElementById("selectedfileDataTerm").innerText = `현재 설정된 파일데이터 텀: ${SEND_TERM} ms`;
 });
 
 
