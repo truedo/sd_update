@@ -162,7 +162,7 @@ async function testSingleFileTransfer2(fileUrl, filePath)
 
 async function testSingleFileTransfer() 
 {
-    console.log("✅ ver 9");
+    console.log("✅ ver 10");
     await connectSerial(); // ESP32 연결
 
     const fileList = await loadFileList();
@@ -177,7 +177,7 @@ async function testSingleFileTransfer()
 
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    console.log(`🚀 파일 전송 시작: ${filePath}`);
+    console.log(`🚀 테스트 파일 전송 시작: ${filePath}`);
 
     let retryCount = 0;
     let success = false;
