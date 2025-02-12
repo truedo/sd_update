@@ -4,33 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESP32 파일 전송</title>
-    <style>
-        #progressContainer {
-            width: 100%;
-            background-color: #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 10px;
-            display: none;
-        }
-        #progressBar {
-            width: 0%;
-            height: 25px;
-            background-color: #4CAF50;
-            text-align: center;
-            line-height: 25px;
-            color: white;
-        }
-    </style>
 </head>
 <body>
 
     <h2>주미 미니 SD 파일 전송 검증 시스템</h2>
     <button onclick="startTransfer()">파일 전송 시작</button>
-    
+   
     <!-- 진행 바 -->
-    <div id="progressContainer">
-        <div id="progressBar"></div>
+    <div id="progressContainer" style="width: 100%; background-color: #ddd;">
+        <div id="progressBar" style="width: 0%; height: 20px; background-color: #4CAF50;"></div>
     </div>
 
     <!-- 진행 상태 텍스트 -->
