@@ -1,0 +1,5 @@
+[[headers]]
+  for = "/*"
+    [headers.values]
+    Cache-Control = "no-cache"
+    Content-Encoding = "identity"
