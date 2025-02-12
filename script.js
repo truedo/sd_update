@@ -11,13 +11,13 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.20'; 
+const VERSION_JS = '1.0.21'; 
 
 const BUFFER_SIZE = 64; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
 
 const SEND_TERM = 50;
-const FILEDATA_TERM = 5;
+const FILEDATA_TERM = 10;
 
 async function connectSerial() {
     try {        
@@ -306,10 +306,8 @@ async function SingleFileTransfer(fileUrl, filePath)
 
 
 
-async function validateFilesOnESP32() {    
-
-  
-
+async function validateFilesOnESP32() 
+{     
     const fileList = await loadFileList();
 
     // 🔷 0-1. 검증 모드 신호 (0xCC) 1바이트
