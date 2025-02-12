@@ -505,7 +505,11 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
     console.log(`ver ${VERSION_JS}`);
     await connectSerial(); // ESP32 연결
 
+    document.getElementById("selectedfileStatus").innerText = "전송 중";
+
     const fileUrl = BASE_URL + selectedFile;
    // await sendFileToESP32(fileUrl, selectedFile, 0, 1); // 파일 전송 함수 실행
     await SingleFileTransfer(fileUrl, selectedFile);
+
+    document.getElementById("selectedfileStatus").innerText = "전송 완료!";
 });
