@@ -318,6 +318,7 @@ async function validateFilesOnESP32()
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
     let send_file_index = 0;
+    const totalFiles = fileList.length;
 
     for (const filePath of fileList) 
     {            
