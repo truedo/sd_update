@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.11'; 
+const VERSION_JS = '1.0.12'; 
 
 const BUFFER_SIZE = 32; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
@@ -88,31 +88,40 @@ async function testSingleFileTransfer2(fileUrl, filePath)
 
         // 📌 파일 크기 확인 (서버 Content-Length)
 
-      //  while(true)
-      //  {
-            const response = await fetch(fileUrl);
-            if (!response.ok) {
-                console.error(`❌ 파일 다운로드 실패: ${fileUrl}`);
-                return;
-            }
+    //   //  while(true)
+    //   //  {
+    //         const response = await fetch(fileUrl);
+    //         if (!response.ok) {
+    //             console.error(`❌ 파일 다운로드 실패: ${fileUrl}`);
+    //             return;
+    //         }
 
-            const contentLength = response.headers.get("Content-Length");
-            if (contentLength) {
-            //  console.log(`📏 서버 제공 파일 크기: ${contentLength} bytes`);
-            }
+    //         const contentLength = response.headers.get("Content-Length");
+    //         if (contentLength) {
+    //         //  console.log(`📏 서버 제공 파일 크기: ${contentLength} bytes`);
+    //         }
 
-            const fileData = await response.arrayBuffer();
-            const fileSize = fileData.byteLength;
+    //         const fileData = await response.arrayBuffer();
+    //         const fileSize = fileData.byteLength;
 
-        // console.log(`📥 다운로드한 파일 크기: ${fileSize} bytes`);
-            if (contentLength && fileSize !== parseInt(contentLength)) 
-            {
-                console.error("⚠️ 파일 크기 불일치! 네트워크 문제 가능성 있음.");   
-                return;             
-            }        
-      //  }
+    //     // console.log(`📥 다운로드한 파일 크기: ${fileSize} bytes`);
+    //         if (contentLength && fileSize !== parseInt(contentLength)) 
+    //         {
+    //             console.error("⚠️ 파일 크기 불일치! 네트워크 문제 가능성 있음.");   
+    //             return;             
+    //         }        
+    //   //  }
+        let fileData;
+        try {
+            fileData = await fetchFileWithRetry(fileUrl);
+        } catch (error) {
+            console.error(error);
+            return;
+        }
 
         // 파일 크기 전송 (4바이트)
+        const fileSize = fileData.byteLength;
+        //console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
         await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
        // console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
         await new Promise(resolve => setTimeout(resolve, 300));
@@ -451,14 +460,7 @@ async function validateFilesOnESP32() {
             }
 
             const fileSize = fileData.byteLength;
-            console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
-
-
-
-
-
-
-
+            //console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
             // 파일 크기 전송 (4바이트)
             await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
             // console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
