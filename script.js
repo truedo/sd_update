@@ -204,11 +204,12 @@ async function SingleFileTransfer(fileUrl, filePath)
     let retryCount = 0;
     let success = false;
 
+    // 🔷 0-1. 전송 모드 신호 (0xee) 1바이트
     await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
     // console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    //await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
+    // 🔷 0-2. 파일 개수 전송 4바이트
     await writer.write(new Uint32Array([0x01])); // 파일 개수 전송 (1개)
     // console.log(`✔️ 전송 성공: 1 개의 파일`);
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -220,18 +221,18 @@ async function SingleFileTransfer(fileUrl, filePath)
             console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES_SEND}`);
         }
 
-        // 파일 경로 길이 전송
+        // 🔶 1. 파일 경로 길이 전송
         await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
-      //  console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
+        // console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // 파일 경로 데이터 전송
+        // 🔶 2. 파일 경로 데이터 전송
         await writer.write(new TextEncoder().encode(filePath));
-      //  console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
+        // console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
         await new Promise(resolve => setTimeout(resolve, 100));
   
     
-        // 📌 파일 크기 확인 (서버 Content-Length)
+        // 📌 파일 크기 확인
         let fileData;
         try {
             fileData = await fetchFileWithRetry(fileUrl);
@@ -240,14 +241,14 @@ async function SingleFileTransfer(fileUrl, filePath)
             return;
         }
 
-        // 파일 크기 전송 (4바이트)
+        // 🔶 3. 파일 크기 전송 (4바이트)
         const fileSize = fileData.byteLength;
-        //console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
+        // console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
         await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
-       // console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
+        // console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // 📌 파일 데이터 전송 (256 바이트씩 나누어 전송)
+        // 📌 4. 파일 데이터 전송 (버퍼 사이즈 만큼 나누어 전송)
         let totalSent = 0;
         const fileArray = new Uint8Array(fileData);
 
@@ -259,19 +260,20 @@ async function SingleFileTransfer(fileUrl, filePath)
             totalSent += chunk.length;
 
             // 진행률 표시
-          //  const percent = Math.round((totalSent / fileSize) * 100);
-          //  console.log(`📊 진행률: ${percent}% (${totalSent}/${fileSize} bytes)`);
+            //  const percent = Math.round((totalSent / fileSize) * 100);
+            //  console.log(`📊 진행률: ${percent}% (${totalSent}/${fileSize} bytes)`);
         }
 
         //console.log(`✅ 전송 완료: ${filePath}`);
 
-        console.log(`❓ 수신 ACK 대기중`);
+        // 🔶 4. 전송 ACK 수신 1바이트
+        console.log(`❓ 전송 ACK 대기중`);
 
         // ESP32로부터 ACK 수신
         const { value } = await reader.read();
         const receivedByte = value[0]; 
 
-        console.log(`📩 받은 ACK: 0x${receivedByte.toString(16).toUpperCase()}`); // hex 출력
+        //console.log(`📩 받은 ACK: 0x${receivedByte.toString(16).toUpperCase()}`); // hex 출력
 
         if (receivedByte === 0xE1) 
         { 
@@ -350,12 +352,12 @@ async function validateFilesOnESP32() {
 
         // 🔶 3. 파일 크기 전송 (4바이트)
         const fileSize = fileData.byteLength;
-        //console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
+        // console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
         await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
         // console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
         await new Promise(resolve => setTimeout(resolve, 100));                        
         
-        // 🔶 4. 파일 ACK 수신 1바이트
+        // 🔶 4. 검증 ACK 수신 1바이트
         console.log(`❓ ${send_file_index} 검증 ACK 대기중`);      
         const { value } = await reader.read();
         const receivedByte = value[0]; 
