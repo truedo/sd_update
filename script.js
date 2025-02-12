@@ -9,7 +9,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.8'; 
+const VERSION_JS = '1.0.9'; 
 
 const BUFFER_SIZE = 32; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
@@ -350,25 +350,29 @@ async function sendFileToESP32(fileUrl, relativePath, index, totalFiles)
     }
 }
 
-
 async function fetchFileWithRetry(url, retries = 3) {
     for (let attempt = 1; attempt <= retries; attempt++) {
-        const response = await fetch(url);
+        console.log(`📥 파일 다운로드 시도 ${attempt}/${retries}: ${url}`);
+
+        // 브라우저 캐시 방지 (항상 최신 데이터 요청)
+        const uniqueUrl = `${url}?_=${new Date().getTime()}`;
+        const response = await fetch(uniqueUrl, { cache: "no-store" });
+
         if (!response.ok) {
-            console.error(`❌ 파일 다운로드 실패 (시도 ${attempt}/${retries}): ${url}`);
-            continue; // 다음 재시도
+            console.error(`❌ 파일 다운로드 실패 (시도 ${attempt}): HTTP ${response.status}`);
+            continue;
         }
 
         const fileData = await response.arrayBuffer();
         const fileSize = fileData.byteLength;
         const contentLength = response.headers.get("Content-Length");
 
-        if (contentLength && fileSize !== parseInt(contentLength)) {
-            console.warn(`⚠️ 파일 크기 불일치! 재시도 (${attempt}/${retries})`);
-            continue; // 다음 재시도
+        if (!contentLength || fileSize === parseInt(contentLength)) {
+            console.log(`✅ 파일 다운로드 성공: ${fileSize} bytes`);
+            return fileData;
+        } else {
+            console.warn(`⚠️ 파일 크기 불일치! (${fileSize} bytes vs ${contentLength} bytes)`);
         }
-
-        return fileData; // 성공하면 반환
     }
 
     throw new Error("❌ 파일 다운로드 실패: 모든 재시도 실패");
@@ -547,8 +551,7 @@ async function startTransfer() {
     //     }
     //     failedFiles = await validateFilesOnESP32();
     // }
-
-    updateProgress(totalFiles, totalFiles, "🎉 모든 파일 전송 및 검증 완료!");
+    //updateProgress(totalFiles, totalFiles, "🎉 모든 파일 전송 및 검증 완료!");
     console.log("🎉 모든 파일 전송 및 검증 완료!");
 }
 
