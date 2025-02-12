@@ -309,7 +309,7 @@ async function SingleFileTransfer(fileUrl, filePath)
 
 async function validateFilesOnESP32() {    
 
-    let send_term = 100
+    let send_term = 50;
 
     const fileList = await loadFileList();
 
@@ -323,11 +323,11 @@ async function validateFilesOnESP32() {
     console.log(`✔️ 전송 성공: ${fileList.length}개의 파일`);
     await new Promise(resolve => setTimeout(resolve, send_term));
 
-    let send_file_index = 0
+    let send_file_index = 0;
 
     for (const filePath of fileList) 
     {            
-        send_file_index += 1
+        send_file_index += 1;
 
         // 🔶 1. 파일 경로 길이 전송
         await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
