@@ -105,13 +105,9 @@ async function testSingleFileTransfer2(fileUrl, filePath)
         // console.log(`📥 다운로드한 파일 크기: ${fileSize} bytes`);
             if (contentLength && fileSize !== parseInt(contentLength)) 
             {
-                console.error("⚠️ 파일 크기 불일치! 네트워크 문제 가능성 있음.");                
-            }
-            else
-            {
-                break;
-            }
-
+                console.error("⚠️ 파일 크기 불일치! 네트워크 문제 가능성 있음.");   
+                return;             
+            }        
       //  }
 
         // 파일 크기 전송 (4바이트)
@@ -354,6 +350,30 @@ async function sendFileToESP32(fileUrl, relativePath, index, totalFiles)
     }
 }
 
+
+async function fetchFileWithRetry(url, retries = 3) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.error(`❌ 파일 다운로드 실패 (시도 ${attempt}/${retries}): ${url}`);
+            continue; // 다음 재시도
+        }
+
+        const fileData = await response.arrayBuffer();
+        const fileSize = fileData.byteLength;
+        const contentLength = response.headers.get("Content-Length");
+
+        if (contentLength && fileSize !== parseInt(contentLength)) {
+            console.warn(`⚠️ 파일 크기 불일치! 재시도 (${attempt}/${retries})`);
+            continue; // 다음 재시도
+        }
+
+        return fileData; // 성공하면 반환
+    }
+
+    throw new Error("❌ 파일 다운로드 실패: 모든 재시도 실패");
+}
+
 async function validateFilesOnESP32() {    
    // let retryCount = 0;
     // try {  
@@ -386,40 +406,65 @@ async function validateFilesOnESP32() {
           //  console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
             await new Promise(resolve => setTimeout(resolve, 500));
 
-            while(true)
-            {
-                const fileUrl = BASE_URL + filePath;
-                // 📌 파일 크기 확인 (서버 Content-Length)
-                const response = await fetch(fileUrl);
-                if (!response.ok) {
-                    console.error(`❌ 파일 다운로드 실패: ${fileUrl}`);
-                    return;
-                }
+          
+            const fileUrl = BASE_URL + filePath;
 
-                const contentLength = response.headers.get("Content-Length");
-                if (contentLength) 
-                    {
-                //  console.log(`📏 서버 제공 파일 크기: ${contentLength} bytes`);
-                }
 
-                const fileData = await response.arrayBuffer();
-                const fileSize = fileData.byteLength;
 
-                 // console.log(`📥 다운로드한 파일 크기: ${fileSize} bytes`);
-                if (contentLength && fileSize !== parseInt(contentLength)) 
-                {
-                    console.error("⚠️ 파일 크기 불일치! 네트워크 문제 가능성 있음.");                
-                }
-                else
-                {
-                    // 파일 크기 전송 (4바이트)
-                    await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
-                    // console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
-                    await new Promise(resolve => setTimeout(resolve, 300));
-                    
-                    break;
-                }
+
+
+            // // 📌 파일 크기 확인 (서버 Content-Length)
+            // const response = await fetch(fileUrl);
+            // if (!response.ok) {
+            //     console.error(`❌ 파일 다운로드 실패: ${fileUrl}`);
+            //     return;
+            // }
+
+            // const contentLength = response.headers.get("Content-Length");
+            // if (contentLength) 
+            //     {
+            // //  console.log(`📏 서버 제공 파일 크기: ${contentLength} bytes`);
+            // }
+
+            // const fileData = await response.arrayBuffer();
+            // const fileSize = fileData.byteLength;
+
+            //     // console.log(`📥 다운로드한 파일 크기: ${fileSize} bytes`);
+            // if (contentLength && fileSize !== parseInt(contentLength)) 
+            // {
+            //     console.error("⚠️ 파일 크기 불일치! 네트워크 문제 가능성 있음.");  
+            //     return;              
+            // }
+        
+
+
+
+
+            let fileData;
+            try {
+                fileData = await fetchFileWithRetry(fileUrl);
+            } catch (error) {
+                console.error(error);
+                return;
             }
+
+            const fileSize = fileData.byteLength;
+            console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
+
+
+
+
+
+
+
+            // 파일 크기 전송 (4바이트)
+            await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
+            // console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
+            await new Promise(resolve => setTimeout(resolve, 300));
+                
+                   
+                
+            
 
           
             console.log(`❓ ${send_file_index} 검증 ACK 대기중`);
