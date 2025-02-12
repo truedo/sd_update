@@ -19,6 +19,9 @@ const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
 const SEND_TERM = 50; // 명령간의 텀
 const FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
 
+
+
+
 async function connectSerial() {
     try {        
         port = await navigator.serial.requestPort();

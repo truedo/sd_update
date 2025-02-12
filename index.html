@@ -24,7 +24,8 @@
             background-color: #4CAF50;
             text-align: center;
             line-height: 25px;
-            color: white; */            
+            color: white; */
+            
             width: 50%;
             height: 30px;
             background-color: #4caf50;
@@ -38,7 +39,15 @@
     <h2>주미 미니 SD 파일 전송 검증 시스템</h2>
     <button onclick="startTransfer()">파일 전송 시작</button>
 
-    
+    <label for="bufferSize">버퍼 크기 선택: </label>
+    <select id="bufferSize">
+        <option value="0">0 (자동)</option>
+        <option value="32">32 bytes</option>
+        <option value="64">64 bytes</option>
+        <option value="128">128 bytes</option>
+        <option value="256" selected>256 bytes</option>
+    </select>
+    <p id="selectedBufferSize">현재 설정된 버퍼 크기: 256 bytes</p>
 
     <!-- 진행 바 -->
     <div id="progressContainer">
