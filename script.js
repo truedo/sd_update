@@ -320,7 +320,8 @@ async function validateFilesOnESP32()
     let send_file_index = 0;
     const totalFiles = fileList.length;
 
-    progressContainer.style.display = 'block';  // 프로그레스바를 보이게 함
+//progressContainer.style.display = 'block';  // 프로그레스바를 보이게 함
+
     for (const filePath of fileList) 
     {            
         send_file_index += 1;
