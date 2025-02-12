@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.16'; 
+const VERSION_JS = '1.0.18'; 
 
 const BUFFER_SIZE = 32; // 버퍼 크기 설정
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
@@ -416,8 +416,6 @@ async function startTransfer()
     const minutes = Math.floor(elapsedTime / 60);
     const seconds = Math.round(elapsedTime % 60);
 
-    console.log(`✅ 전체 파일 전송 완료!`);
-    console.log(`📊 총 전송 파일: ${transferredFiles}/${totalFiles}`);
     console.log(`⏳ 총 소요 시간: ${minutes}분 ${seconds}초`);
 }
 
