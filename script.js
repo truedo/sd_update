@@ -488,7 +488,7 @@ async function loadFileList2() {
 }
 
 // 🔹 페이지 로드 시 파일 목록 불러오기
-document.addEventListener("DOMContentLoaded", loadFileList);
+document.addEventListener("DOMContentLoaded", loadFileList2);
 
 
 document.getElementById("sendSelectedFile").addEventListener("click", async function() {
