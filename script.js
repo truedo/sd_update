@@ -320,7 +320,6 @@ async function validateFilesOnESP32()
     let send_file_index = 0;
     const totalFiles = fileList.length;
 
-//progressContainer.style.display = 'block';  // 프로그레스바를 보이게 함
 
     for (const filePath of fileList) 
     {            
@@ -420,7 +419,11 @@ async function startTransfer()
     console.log(`⏳ 총 소요 시간: ${minutes}분 ${seconds}초`);
 }
 
-function updateProgress(currentIndex, totalFiles, filePath) {
+function updateProgress(currentIndex, totalFiles, filePath)
+{
+    const progressContainer = document.getElementById('progressContainer');
+    progressContainer.style.display = 'block';  // 프로그레스바를 보이게 함
+
     const percent = Math.round((currentIndex / totalFiles) * 100);
     
     // 진행 바 업데이트
