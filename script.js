@@ -14,10 +14,10 @@ const TIMEOUT = 3000; // ms
 const VERSION_JS = '1.0.22'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
+let SEND_TERM = 50; // 명령간의 텀
 
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
 
-const SEND_TERM = 50; // 명령간의 텀
 const FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
 
 
@@ -410,8 +410,8 @@ async function startTransfer()
 
     console.log(`ver ${VERSION_JS}`);
     await connectSerial();
-
-    console.log("🔍 파일 검증 시작...");
+    console.log(`🔍 파일 검증 시작: (전송 텀: ${SEND_TERM} ms)`);
+   // console.log("🔍 파일 검증 시작...");
     await validateFilesOnESP32();
    
     console.log("🎉 모든 파일 전송 및 검증 완료!");
@@ -429,6 +429,14 @@ document.getElementById("bufferSize").addEventListener("change", function() {
     BUFFER_SIZE = parseInt(this.value, 10); // 선택된 값 적용
     document.getElementById("selectedBufferSize").innerText = `현재 설정된 버퍼 크기: ${BUFFER_SIZE} bytes`;
 });
+
+
+// 🔹 전송 텀 선택 시 업데이트
+document.getElementById("sendTerm").addEventListener("change", function() {
+    SEND_TERM = parseInt(this.value, 10); // 선택된 값 적용
+    document.getElementById("selectedsendTerm").innerText = `현재 설정된 전송 텀: ${SEND_TERM} bytes`;
+});
+
 
 function updateProgress(currentIndex, totalFiles, filePath)
 {
