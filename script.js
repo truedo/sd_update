@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.30'; 
+const VERSION_JS = '1.0.31'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -139,7 +139,9 @@ class SDCardUploader
   async validateFiles(files) {
     await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
     await this.writer.write(this.packUint32LE(files.length));
-    
+
+    console.log(`✔️ 전송 성공: ${fileList.length}개의 파일`);
+
     for(const [index, file] of files.entries()) 
         {
       const relativePath = file.webkitRelativePath || file.name;
@@ -237,6 +239,7 @@ async function testSingleFileTransfer()
         console.log("❌ 전송할 파일이 없습니다.");
         return;
     }
+
     try {
         await uploader.connect();
        // const files = await getFilesFromDirectory(); // 웹 디렉토리 접근
