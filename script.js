@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.45'; 
+const VERSION_JS = '1.0.46'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -93,18 +93,18 @@ class SDCardUploader
     const convertedPath = relativePath.replace(/\\/g, '/');
     const pathData = new TextEncoder().encode(convertedPath);
 
-    console.warn("경로 길이 전송");
+   // console.warn("경로 길이 전송");
 
     // 경로 길이 전송
     await this.writer.write(this.packUint32LE(pathData.byteLength));
     await this.waitForACK();
 
-    console.warn("경로 데이터 전송");
+   // console.warn("경로 데이터 전송");
 
     // 경로 데이터 전송
     await this.sendChunked(pathData);
 
-    console.warn("파일 크기 전송");
+   // console.warn("파일 크기 전송");
     // 파일 크기 전송
     await this.writer.write(this.packUint32LE(fileSize));
     await this.waitForACK();
@@ -197,7 +197,7 @@ class SDCardUploader
 
       await this.sendFileMetadata(relativePath, fileSize);
 
-      console.log(`검증 기다리기`);
+      console.log(`⌚검증 기다리기`);
       try 
       {
         await this.waitForACK();
