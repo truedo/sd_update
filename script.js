@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.46'; 
+const VERSION_JS = '1.0.47'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -122,8 +122,19 @@ class SDCardUploader
   // 파일 전송 메인 로직 (파이썬 send_file 대응)
   async sendFile(file, relativePath) {
     let retryCount = 0;
-    const fileSize = file.size;
-    const fileReader = file.stream().getReader();
+    // const fileSize = file.size;
+    // const fileReader = file.stream().getReader();
+
+
+    const response = await fetch(file);   // file은 URL
+    const blob = await response.blob();
+    const fileSize = blob.size;
+
+    console.error(`response ${response}`);
+    console.error(`fileSize ${fileSize}`);
+
+    // Blob은 스트림을 지원하므로, 스트림을 가져올 수 있습니다.
+    const fileReader = blob.stream().getReader();
 
     console.log(`파일전송 1`);
 
