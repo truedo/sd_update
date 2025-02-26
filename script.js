@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.33'; 
+const VERSION_JS = '1.0.34'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -62,7 +62,11 @@ class SDCardUploader
         if(value?.get(0) === 0xE2) throw new Error('CRC 오류');
         if(value?.get(0) === 0xE3) throw new Error('크기 불일치');
       } catch(error) {
-        console.error(`ACK 오류: ${error.message}`);
+        if (error && error.message) {
+          console.error(`ACK 오류: ${error.message}`);
+        } else {
+          console.error('ACK 오류: 알 수 없는 오류 발생');
+        }  
         throw error;
       }
     }
@@ -117,7 +121,12 @@ class SDCardUploader
         return await this.waitForACK();
         
       } catch(error) {
-        console.error(`전송 실패 (시도 ${retryCount+1}): ${error.message}`);
+        //console.error(`전송 실패 (시도 ${retryCount+1}): ${error.message}`);
+        if (error && error.message) {
+          console.error(`전송 실패 (시도 ${retryCount+1}): ${error.message}`);
+        } else {
+          console.error(`전송 실패 (시도 ${retryCount+1}): 알 수 없는 오류 발생`);
+        }        
         await this.resetConnection();
         retryCount++;
       }
