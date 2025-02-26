@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.41'; 
+const VERSION_JS = '1.0.42'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -54,7 +54,11 @@ class SDCardUploader
     console.log(`❓ ACK 대기중`);
     const { value } = await this.reader.read();
     const receivedByte = value[0];
-    if(receivedByte === 0xE1) return true;
+    if(receivedByte === 0xE1) 
+      {
+        console.warn("✔️ACK 성공");
+        return true;
+      }
     if(receivedByte === 0xE2) throw new Error('CRC 오류');
     if(receivedByte === 0xE3) throw new Error('크기 불일치');
 
