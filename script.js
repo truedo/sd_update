@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.47'; 
+const VERSION_JS = '1.0.48'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -125,6 +125,15 @@ class SDCardUploader
     // const fileSize = file.size;
     // const fileReader = file.stream().getReader();
 
+    await this.writer.write(new Uint8Array([0xee])); // 검증 모드
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+    // 🔷 0-2. 파일 개수 전송 4바이트
+    await this.writer.write(this.packUint32LE(1));
+    // console.log(`✔️ 전송 성공: 1 개의 파일`);
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+
 
     const response = await fetch(file);   // file은 URL
     const blob = await response.blob();
@@ -133,10 +142,14 @@ class SDCardUploader
     console.error(`response ${response}`);
     console.error(`fileSize ${fileSize}`);
 
+
+
+
     // Blob은 스트림을 지원하므로, 스트림을 가져올 수 있습니다.
     const fileReader = blob.stream().getReader();
 
     console.log(`파일전송 1`);
+
 
     while(retryCount < this.retryLimit) {
       try {
