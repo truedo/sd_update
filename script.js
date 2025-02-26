@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.25'; 
+const VERSION_JS = '1.0.26'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -230,6 +230,10 @@ async function testSingleFileTransfer()
 
      const fileUrl = BASE_URL + fileList[10]; // 첫 번째 파일 가져오기
      const filePath = fileList[10]; // 상대 경로 유지
+
+
+    console.log(`✅ fileUrl: ${fileUrl}`);
+    console.log(`✅ filePath: ${filePath}`);
 
     await uploader.sendFile(fileUrl, filePath);
 
