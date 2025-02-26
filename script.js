@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.22'; 
+const VERSION_JS = '1.0.23'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -155,18 +155,18 @@ class SDCardUploader
   }
 }
 
-// 사용 예시
-const uploader = new SDCardUploader();
-document.querySelector('#uploadBtn').addEventListener('click', async () => {
-  try {
-    await uploader.connect();
-    const files = await getFilesFromDirectory(); // 웹 디렉토리 접근
-    await uploader.validateFiles(files);
-    console.log("모든 파일 전송 완료!");
-  } catch(error) {
-    console.error("전송 실패:", error);
-  }
-});
+// // 사용 예시
+// const uploader = new SDCardUploader();
+// document.querySelector('#uploadBtn').addEventListener('click', async () => {
+//   try {
+//     await uploader.connect();
+//     const files = await getFilesFromDirectory(); // 웹 디렉토리 접근
+//     await uploader.validateFiles(files);
+//     console.log("모든 파일 전송 완료!");
+//   } catch(error) {
+//     console.error("전송 실패:", error);
+//   }
+// });
 
 
 async function connectSerial() {
