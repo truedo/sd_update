@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.27'; 
+const VERSION_JS = '1.0.28'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -226,36 +226,36 @@ async function fetchFileWithRetry(url, retries = 3) {
 
 async function testSingleFileTransfer() 
 {    
-    await uploader.connect();
+
 
     const fileList = await loadFileList();
     if (fileList.length === 0) {
         console.log("❌ 전송할 파일이 없습니다.");
         return;
     }
-
-    const fileUrl = BASE_URL + fileList[10]; // 첫 번째 파일 가져오기
-    const filePath = fileList[10]; // 상대 경로 유지
-
-
-    console.log(`✅ fileUrl: ${fileUrl}`);
-    console.log(`✅ filePath: ${filePath}`);
-
-    // 📌 파일 크기 확인 (서버 Content-Length)
-    let fileData;
     try {
-        fileData = await fetchFileWithRetry(fileUrl);
-    } catch (error) {
-        console.error(error);
-        return;
-    }
-
-    // 파일 크기 전송 (4바이트)
-    const fileSize = fileData.byteLength;
-
+        await uploader.connect();
+       // const files = await getFilesFromDirectory(); // 웹 디렉토리 접근
+        await uploader.validateFiles(fileList);
+        console.log("모든 파일 전송 완료!");
+      } catch(error) {
+        console.error("전송 실패:", error);
+      }
 
 
-    await uploader.sendFile(fileUrl, fileSize);
+
+    //-------------------------------------------------------------------------//
+   
+
+
+
+    
+
+
+
+
+
+    
 
     // console.log(`ver ${VERSION_JS}`);
     // await connectSerial(); // ESP32 연결
