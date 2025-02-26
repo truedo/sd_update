@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.52'; 
+const VERSION_JS = '1.0.53'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -209,12 +209,12 @@ class SDCardUploader
 
     let send_file_index = 0;
     //for(const [index, file] of files.entries()) 
-      for (const relativePath of files) 
-      {          
+    for (const relativePath of files) 
+    {          
         send_file_index += 1;
       //const relativePath = file.webkitRelativePath || file.name;
 
-      console.log(`✔️ 전송 성공: ${relativePath} 파일 이름`);
+      console.log(`✔️ ${send_file_index}: ${relativePath} 파일 이름`);
 
       const fileUrl = BASE_URL + relativePath;        
       let fileData;
