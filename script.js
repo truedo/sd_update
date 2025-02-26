@@ -20,7 +20,153 @@ let FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
 const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
 
 
+class SDCardUploader 
+{
+  constructor() {
+    this.port = null;
+    this.reader = null;
+    this.writer = null;
+    this.BUFFER_SIZE = 64; // 웹 최적화 버퍼 크기
+    this.retryLimit = 3;
+    this.timeout = 1000; // 기본 타임아웃 1초
+  }
 
+  // 장치 연결
+  async connect() {
+    this.port = await navigator.serial.requestPort();
+    await this.port.open({ baudRate: 921600 });
+    [this.reader, this.writer] = [
+      this.port.readable.getReader(),
+      this.port.writable.getWriter()
+    ];
+  }
+
+  // 리틀 엔디언 변환 (파이썬 struct.pack 대응)
+  packUint32LE(value) {
+    const buffer = new ArrayBuffer(4);
+    new DataView(buffer).setUint32(0, value, true);
+    return new Uint8Array(buffer);
+  }
+
+  // ACK 대기 (파이썬 ser.read(1) 대응)
+  async waitForACK() {
+    while(true) {
+      try {
+        const { value, done } = await Promise.race([
+          this.reader.read(),
+          new Promise((_, r) => setTimeout(r, this.timeout))
+            .then(() => { throw new Error('ACK 타임아웃') })
+        ]);
+        
+        if(value?.get(0) === 0xE1) return true;
+        if(value?.get(0) === 0xE2) throw new Error('CRC 오류');
+        if(value?.get(0) === 0xE3) throw new Error('크기 불일치');
+      } catch(error) {
+        console.error(`ACK 오류: ${error.message}`);
+        throw error;
+      }
+    }
+  }
+
+  // 파일 메타데이터 전송 (파이썬 send_file 구조 대응)
+  async sendFileMetadata(relativePath, fileSize) {
+    const convertedPath = relativePath.replace(/\\/g, '/');
+    const pathData = new TextEncoder().encode(convertedPath);
+    
+    // 경로 길이 전송
+    await this.writer.write(this.packUint32LE(pathData.byteLength));
+    await this.waitForACK();
+    
+    // 경로 데이터 전송
+    await this.sendChunked(pathData);
+    
+    // 파일 크기 전송
+    await this.writer.write(this.packUint32LE(fileSize));
+    await this.waitForACK();
+  }
+
+  // 청크 분할 전송 (파이썬 버퍼링 대응)
+  async sendChunked(data) {
+    for(let offset=0; offset<data.length; offset+=this.BUFFER_SIZE) {
+      const chunk = data.slice(offset, offset+this.BUFFER_SIZE);
+      await this.writer.write(chunk);
+      await this.waitForACK();
+    }
+  }
+
+  // 파일 전송 메인 로직 (파이썬 send_file 대응)
+  async sendFile(file, relativePath) {
+    let retryCount = 0;
+    const fileSize = file.size;
+    const fileReader = file.stream().getReader();
+
+    while(retryCount < this.retryLimit) {
+      try {
+        // 메타데이터 전송
+        await this.sendFileMetadata(relativePath, fileSize);
+        
+        // 파일 데이터 전송
+        while(true) {
+          const { done, value } = await fileReader.read();
+          if(done) break;
+          await this.sendChunked(value);
+        }
+        
+        // 최종 검증
+        await this.writer.write(new Uint8Array([0xCC])); // 검증 신호
+        return await this.waitForACK();
+        
+      } catch(error) {
+        console.error(`전송 실패 (시도 ${retryCount+1}): ${error.message}`);
+        await this.resetConnection();
+        retryCount++;
+      }
+    }
+    throw new Error(`최종 전송 실패: ${relativePath}`);
+  }
+
+  // 연결 재설정 (파이썬 ser 재생성 대응)
+  async resetConnection() {
+    await this.reader.cancel();
+    await this.writer.close();
+    [this.reader, this.writer] = [
+      this.port.readable.getReader(),
+      this.port.writable.getWriter()
+    ];
+  }
+
+  // 폴더 검증 (파이썬 validate_files 대응)
+  async validateFiles(files) {
+    await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
+    await this.writer.write(this.packUint32LE(files.length));
+    
+    for(const [index, file] of files.entries()) {
+      const relativePath = file.webkitRelativePath || file.name;
+      await this.sendFileMetadata(relativePath, file.size);
+      
+      try {
+        await this.waitForACK();
+        console.log(`✅ ${index+1} 검증 완료: ${relativePath}`);
+      } catch(error) {
+        console.log(`❌ ${index+1} 검증 실패: ${relativePath}`);
+        await this.sendFile(file, relativePath); // 재전송
+      }
+    }
+  }
+}
+
+// 사용 예시
+const uploader = new SDCardUploader();
+document.querySelector('#uploadBtn').addEventListener('click', async () => {
+  try {
+    await uploader.connect();
+    const files = await getFilesFromDirectory(); // 웹 디렉토리 접근
+    await uploader.validateFiles(files);
+    console.log("모든 파일 전송 완료!");
+  } catch(error) {
+    console.error("전송 실패:", error);
+  }
+});
 
 
 async function connectSerial() {
@@ -80,123 +226,124 @@ async function fetchFileWithRetry(url, retries = 3) {
 
 async function testSingleFileTransfer() 
 {    
-    console.log(`ver ${VERSION_JS}`);
-    await connectSerial(); // ESP32 연결
+    await uploader.connect();
+    // console.log(`ver ${VERSION_JS}`);
+    // await connectSerial(); // ESP32 연결
 
-    const fileList = await loadFileList();
-    if (fileList.length === 0) {
-        console.log("❌ 전송할 파일이 없습니다.");
-        return;
-    }
+    // const fileList = await loadFileList();
+    // if (fileList.length === 0) {
+    //     console.log("❌ 전송할 파일이 없습니다.");
+    //     return;
+    // }
 
-    const fileUrl = BASE_URL + fileList[10]; // 첫 번째 파일 가져오기
-    const filePath = fileList[10]; // 상대 경로 유지
+    // const fileUrl = BASE_URL + fileList[10]; // 첫 번째 파일 가져오기
+    // const filePath = fileList[10]; // 상대 경로 유지
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // await new Promise(resolve => setTimeout(resolve, 100));
 
-    console.log(`🚀 테스트 파일 전송 시작: ${filePath} (버퍼 크기: ${BUFFER_SIZE} bytes)`);
+    // console.log(`🚀 테스트 파일 전송 시작: ${filePath} (버퍼 크기: ${BUFFER_SIZE} bytes)`);
 
-    let retryCount = 0;
-    let success = false;
+    // let retryCount = 0;
+    // let success = false;
 
-    await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
-    console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // await writer.write(new Uint8Array([0xee]));   // 전송 시작 신호
+    // console.log("✔️ 전송 성공 [0xee] 파일 전송 시작 바이트");
+    // await new Promise(resolve => setTimeout(resolve, 100));
 
-    //await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
-    await writer.write(new Uint32Array([0x01])); // 파일 개수 전송 (1개)
-    console.log(`✔️ 전송 성공: 1 개의 파일`);
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // //await writer.write(new Uint8Array([0x01])); // 파일 개수 전송 (1개)
+    // await writer.write(new Uint32Array([0x01])); // 파일 개수 전송 (1개)
+    // console.log(`✔️ 전송 성공: 1 개의 파일`);
+    // await new Promise(resolve => setTimeout(resolve, 100));
 
-    while (retryCount < MAX_RETRIES_SEND && !success) 
-    {      
-        if (retryCount > 0) 
-        {
-            console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES_SEND}`);
-        }
+    // while (retryCount < MAX_RETRIES_SEND && !success) 
+    // {      
+    //     if (retryCount > 0) 
+    //     {
+    //         console.warn(`📌 재전송 시도: ${retryCount}/${MAX_RETRIES_SEND}`);
+    //     }
 
-        // 파일 경로 길이 전송
-        await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
-        console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
-        await new Promise(resolve => setTimeout(resolve, 100));
+    //     // 파일 경로 길이 전송
+    //     await writer.write(new Uint8Array(new Uint32Array([filePath.length]).buffer));
+    //     console.log(`✔️ 전송 성공: ${filePath.length} 파일 길이`);
+    //     await new Promise(resolve => setTimeout(resolve, 100));
 
-        // 파일 경로 데이터 전송
-        await writer.write(new TextEncoder().encode(filePath));
-        console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
-        await new Promise(resolve => setTimeout(resolve, 100));
+    //     // 파일 경로 데이터 전송
+    //     await writer.write(new TextEncoder().encode(filePath));
+    //     console.log(`✔️ 전송 성공: ${filePath} 파일 이름`);
+    //     await new Promise(resolve => setTimeout(resolve, 100));
 
       
-        // 📌 파일 크기 확인 (서버 Content-Length)
-        let fileData;
-        try {
-            fileData = await fetchFileWithRetry(fileUrl);
-        } catch (error) {
-            console.error(error);
-            return;
-        }
+    //     // 📌 파일 크기 확인 (서버 Content-Length)
+    //     let fileData;
+    //     try {
+    //         fileData = await fetchFileWithRetry(fileUrl);
+    //     } catch (error) {
+    //         console.error(error);
+    //         return;
+    //     }
 
-        // 파일 크기 전송 (4바이트)
-        const fileSize = fileData.byteLength;
-        console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
-        await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
-        console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
-        await new Promise(resolve => setTimeout(resolve, 100));
+    //     // 파일 크기 전송 (4바이트)
+    //     const fileSize = fileData.byteLength;
+    //     console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
+    //     await writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
+    //     console.log(`✔️ 전송 성공: ${fileSize} 바이트 파일 크기`);
+    //     await new Promise(resolve => setTimeout(resolve, 100));
 
 
-        // 📌 파일 데이터 전송 (256 바이트씩 나누어 전송)
-        let totalSent = 0;
-        const fileArray = new Uint8Array(fileData);
+    //     // 📌 파일 데이터 전송 (256 바이트씩 나누어 전송)
+    //     let totalSent = 0;
+    //     const fileArray = new Uint8Array(fileData);
 
-        //console.log(`📤 파일 전송 시작: ${filePath}`);
-        console.log(`📤 파일 전송 시작: ${filePath} (파일데이텀 텀: ${FILEDATA_TERM} ms)`);
-        for (let i = 0; i < fileSize; i += BUFFER_SIZE) {
-            const chunk = fileArray.slice(i, i + BUFFER_SIZE);
-            await writer.write(chunk);
-            await new Promise(resolve => setTimeout(resolve, 10));
-            totalSent += chunk.length;
+    //     //console.log(`📤 파일 전송 시작: ${filePath}`);
+    //     console.log(`📤 파일 전송 시작: ${filePath} (파일데이텀 텀: ${FILEDATA_TERM} ms)`);
+    //     for (let i = 0; i < fileSize; i += BUFFER_SIZE) {
+    //         const chunk = fileArray.slice(i, i + BUFFER_SIZE);
+    //         await writer.write(chunk);
+    //         await new Promise(resolve => setTimeout(resolve, 10));
+    //         totalSent += chunk.length;
 
-          // 진행률 표시
-            const percent = Math.round((totalSent / fileSize) * 100);
-            console.log(`📊 진행률: ${percent}% (${totalSent}/${fileSize} bytes)`);
-        }
+    //       // 진행률 표시
+    //         const percent = Math.round((totalSent / fileSize) * 100);
+    //         console.log(`📊 진행률: ${percent}% (${totalSent}/${fileSize} bytes)`);
+    //     }
 
-        console.log(`✅ 전송 완료: ${filePath}`);
+    //     console.log(`✅ 전송 완료: ${filePath}`);
 
-        console.log(`❓ 수신 ACK 대기중`);
+    //     console.log(`❓ 수신 ACK 대기중`);
 
-        // ESP32로부터 ACK 수신
-        const { value } = await reader.read();
-        const receivedByte = value[0]; 
+    //     // ESP32로부터 ACK 수신
+    //     const { value } = await reader.read();
+    //     const receivedByte = value[0]; 
 
-        console.log(`📩 받은 ACK: 0x${receivedByte.toString(16).toUpperCase()}`); // hex 출력
+    //     console.log(`📩 받은 ACK: 0x${receivedByte.toString(16).toUpperCase()}`); // hex 출력
 
-        if (receivedByte === 0xE1) 
-        { 
-            console.log("✔️ 전송 성공");
-            success = true;
-        } 
-        else 
-        {
-            if (receivedByte === 0xE2) 
-            {
-                console.warn("❌ 파일 바이트 부족 - 재전송 필요");
-            } 
-            else if (receivedByte === 0xE3) 
-            {
-                console.warn("❌ 파일 바이트 다름 - 재전송 필요");
-            } 
-            // else 
-            // {
-                console.warn("❌ 전송 오류 - 재전송 필요");
-            //}
-            retryCount++;
-        }
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    if (!success) 
-    {
-        console.error("❌ 파일 전송 실패: 최대 재전송 횟수 초과");
-    }
+    //     if (receivedByte === 0xE1) 
+    //     { 
+    //         console.log("✔️ 전송 성공");
+    //         success = true;
+    //     } 
+    //     else 
+    //     {
+    //         if (receivedByte === 0xE2) 
+    //         {
+    //             console.warn("❌ 파일 바이트 부족 - 재전송 필요");
+    //         } 
+    //         else if (receivedByte === 0xE3) 
+    //         {
+    //             console.warn("❌ 파일 바이트 다름 - 재전송 필요");
+    //         } 
+    //         // else 
+    //         // {
+    //             console.warn("❌ 전송 오류 - 재전송 필요");
+    //         //}
+    //         retryCount++;
+    //     }
+    //     await new Promise(resolve => setTimeout(resolve, 100));
+    // }
+    // if (!success) 
+    // {
+    //     console.error("❌ 파일 전송 실패: 최대 재전송 횟수 초과");
+    // }
 }
 
 async function SingleFileTransfer(fileUrl, filePath) 
