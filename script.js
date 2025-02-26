@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.31'; 
+const VERSION_JS = '1.0.32'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -142,13 +142,25 @@ class SDCardUploader
 
     console.log(`✔️ 전송 성공: ${fileList.length}개의 파일`);
 
-    for(const [index, file] of files.entries()) 
-        {
-      const relativePath = file.webkitRelativePath || file.name;
+    //for(const [index, file] of files.entries()) 
+      for (const relativePath of fileList) 
+      {          
+      //const relativePath = file.webkitRelativePath || file.name;
 
-      console.log(`${relativePath}`);
+      console.log(`✔️ 전송 성공: ${relativePath} 파일 이름`);
 
-      await this.sendFileMetadata(relativePath, file.size);
+      const fileUrl = BASE_URL + relativePath;        
+      let fileData;
+      try {
+          fileData = await fetchFileWithRetry(fileUrl);
+      } catch (error) {
+          console.error(error);
+          return;
+      }
+      const fileSize = fileData.byteLength;
+      console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
+
+      await this.sendFileMetadata(relativePath, fileSize);
       
       try {
         await this.waitForACK();
@@ -232,7 +244,7 @@ async function fetchFileWithRetry(url, retries = 3) {
 
 async function testSingleFileTransfer() 
 {    
-
+    console.log(`ver ${VERSION_JS}`);
 
     const fileList = await loadFileList();
     if (fileList.length === 0) {
