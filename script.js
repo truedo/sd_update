@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.56'; 
+const VERSION_JS = '1.0.57'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -240,8 +240,10 @@ class SDCardUploader
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
         await this.writer.write(this.packUint32LE(files.length- send_file_index));
         console.log(`✔️ ${send_file_index} 남은 갯수: ${files.length - send_file_index}개`);  
+
       }
-      await this.writer.write(this.packUint32LE(files.length- send_file_index));
+      await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
     }
   }
 }
