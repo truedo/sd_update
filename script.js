@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.36'; 
+const VERSION_JS = '1.0.37'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -52,7 +52,7 @@ class SDCardUploader
   async waitForACK() {
     while(true) {
       try {
-        const { value, done } = await Promise.race([
+        const { value } = await Promise.race([
           this.reader.read(),
           new Promise((_, r) => setTimeout(r, this.timeout))
             .then(() => { throw new Error('ACK 타임아웃') })
