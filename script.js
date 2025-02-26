@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.24'; 
+const VERSION_JS = '1.0.25'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -227,6 +227,12 @@ async function fetchFileWithRetry(url, retries = 3) {
 async function testSingleFileTransfer() 
 {    
     await uploader.connect();
+
+     const fileUrl = BASE_URL + fileList[10]; // 첫 번째 파일 가져오기
+     const filePath = fileList[10]; // 상대 경로 유지
+
+    await uploader.sendFile(fileUrl, filePath);
+
     // console.log(`ver ${VERSION_JS}`);
     // await connectSerial(); // ESP32 연결
 
