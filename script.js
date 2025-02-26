@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.54'; 
+const VERSION_JS = '1.0.55'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -136,22 +136,17 @@ class SDCardUploader
     // console.log(`✔️ 전송 성공: 1 개의 파일`);
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
-
-
     const response = await fetch(file);   // file은 URL
     const blob = await response.blob();
     const fileSize = blob.size;
 
-    console.log(`response ${response}`);
-    console.log(`fileSize ${fileSize}`);
-
-
-
+    //console.log(`response ${response}`);
+    //console.log(`fileSize ${fileSize}`);
 
     // Blob은 스트림을 지원하므로, 스트림을 가져올 수 있습니다.
     const fileReader = blob.stream().getReader();
 
-    console.log(`파일전송 1`);
+    console.log(`📩 파일 전송 시작`);
 
     while(retryCount < this.retryLimit) {
       try {
@@ -164,7 +159,7 @@ class SDCardUploader
           const { done, value } = await fileReader.read();
           if(done)
           {
-            console.log(`전송 완료`);
+            console.log(`✔️ 파일 전송 완료`);
             break;
           }
           await this.sendChunked(value);
@@ -211,7 +206,7 @@ class SDCardUploader
     //for(const [index, file] of files.entries()) 
     for (const relativePath of files) 
     {          
-        send_file_index += 1;
+      send_file_index += 1;
       //const relativePath = file.webkitRelativePath || file.name;
 
       console.log(`✔️ ${send_file_index}: ${relativePath} 파일 이름`);
