@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.48'; 
+const VERSION_JS = '1.0.49'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -139,8 +139,8 @@ class SDCardUploader
     const blob = await response.blob();
     const fileSize = blob.size;
 
-    console.error(`response ${response}`);
-    console.error(`fileSize ${fileSize}`);
+    console.log(`response ${response}`);
+    console.log(`fileSize ${fileSize}`);
 
 
 
@@ -159,7 +159,11 @@ class SDCardUploader
         // 파일 데이터 전송
         while(true) {
           const { done, value } = await fileReader.read();
-          if(done) break;
+          if(done)
+          {
+            console.log(`전송 완료`);
+            break;
+          }
           await this.sendChunked(value);
         }
         
