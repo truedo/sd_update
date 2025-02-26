@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.49'; 
+const VERSION_JS = '1.0.50'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -150,7 +150,6 @@ class SDCardUploader
 
     console.log(`파일전송 1`);
 
-
     while(retryCount < this.retryLimit) {
       try {
         // 메타데이터 전송
@@ -165,6 +164,7 @@ class SDCardUploader
             break;
           }
           await this.sendChunked(value);
+          await new Promise(resolve => setTimeout(resolve, FILEDATA_TERM));
         }
         
         // 최종 검증
