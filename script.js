@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.37'; 
+const VERSION_JS = '1.0.38'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -49,27 +49,38 @@ class SDCardUploader
   }
 
   // ACK 대기 (파이썬 ser.read(1) 대응)
-  async waitForACK() {
-    while(true) {
-      try {
-        const { value } = await Promise.race([
-          this.reader.read(),
-          new Promise((_, r) => setTimeout(r, this.timeout))
-            .then(() => { throw new Error('ACK 타임아웃') })
-        ]);
+  async waitForACK() 
+  {
+    const { value } = await reader.read();
         const receivedByte = value[0];
         if(receivedByte === 0xE1) return true;
         if(receivedByte === 0xE2) throw new Error('CRC 오류');
         if(receivedByte === 0xE3) throw new Error('크기 불일치');
-      } catch(error) {
-        if (error && error.message) {
-          console.error(`ACK 오류: ${error.message}`);
-        } else {
-          console.error('ACK 오류: 알 수 없는 오류 발생');
-        }  
-        throw error;
-      }
-    }
+
+    // while(true) 
+    //   {
+    //   try 
+    //   {
+    //     const { value } = await Promise.race([
+    //       this.reader.read(),
+    //       new Promise((_, r) => setTimeout(r, this.timeout))
+    //         .then(() => { throw new Error('ACK 타임아웃') })
+    //     ]);
+    //     const receivedByte = value[0];
+    //     if(receivedByte === 0xE1) return true;
+    //     if(receivedByte === 0xE2) throw new Error('CRC 오류');
+    //     if(receivedByte === 0xE3) throw new Error('크기 불일치');
+    //   } 
+    //   catch(error) 
+    //   {
+    //     if (error && error.message) {
+    //       console.error(`ACK 오류: ${error.message}`);
+    //     } else {
+    //       console.error('ACK 오류: 알 수 없는 오류 발생');
+    //     }  
+    //     throw error;
+    //   }
+    // }
   }
 
   // 파일 메타데이터 전송 (파이썬 send_file 구조 대응)
@@ -172,10 +183,13 @@ class SDCardUploader
 
       await this.sendFileMetadata(relativePath, fileSize);
       
-      try {
+      try 
+      {
         await this.waitForACK();
         console.log(`✅ ${index+1} 검증 완료: ${relativePath}`);
-      } catch(error) {
+      } 
+      catch(error) 
+      {
         console.log(`❌ ${index+1} 검증 실패: ${relativePath}`);
         await this.sendFile(file, relativePath); // 재전송
       }
