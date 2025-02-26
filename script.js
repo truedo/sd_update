@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.51'; 
+const VERSION_JS = '1.0.52'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -111,11 +111,14 @@ class SDCardUploader
   }
 
   // 청크 분할 전송 (파이썬 버퍼링 대응)
-  async sendChunked(data) {
-    for(let offset=0; offset<data.length; offset+=this.BUFFER_SIZE) {
+  async sendChunked(data) 
+  {
+    for(let offset=0; offset<data.length; offset+=this.BUFFER_SIZE) 
+      {
       const chunk = data.slice(offset, offset+this.BUFFER_SIZE);
       await this.writer.write(chunk);
       await this.waitForACK();
+      await new Promise(resolve => setTimeout(resolve, FILEDATA_TERM));
     }
   }
 
@@ -165,7 +168,7 @@ class SDCardUploader
             break;
           }
           await this.sendChunked(value);
-          await new Promise(resolve => setTimeout(resolve, FILEDATA_TERM));
+         
         }
         
         // 최종 검증
