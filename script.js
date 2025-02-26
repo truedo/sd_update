@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.43'; 
+const VERSION_JS = '1.0.44'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -125,6 +125,8 @@ class SDCardUploader
     const fileSize = file.size;
     const fileReader = file.stream().getReader();
 
+    console.log(`파일전송 1`);
+
     while(retryCount < this.retryLimit) {
       try {
         // 메타데이터 전송
@@ -173,9 +175,11 @@ class SDCardUploader
 
     console.log(`✔️ 전송 성공: ${files.length}개의 파일`);
 
+    let send_file_index = 0;
     //for(const [index, file] of files.entries()) 
       for (const relativePath of files) 
       {          
+        send_file_index += 1;
       //const relativePath = file.webkitRelativePath || file.name;
 
       console.log(`✔️ 전송 성공: ${relativePath} 파일 이름`);
@@ -197,12 +201,12 @@ class SDCardUploader
       try 
       {
         await this.waitForACK();
-        console.log(`✅ ${index+1} 검증 완료: ${relativePath}`);
+        console.log(`✅ ${send_file_index} 검증 완료: ${relativePath}`);
       } 
       catch(error) 
       {
-        console.log(`❌ ${index+1} 검증 실패: ${relativePath}`);
-        await this.sendFile(file, relativePath); // 재전송
+        console.log(`❌ ${send_file_index} 검증 실패: ${relativePath}`);
+        await this.sendFile(fileUrl, relativePath); // 재전송
       }
     }
   }
