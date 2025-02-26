@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.55'; 
+const VERSION_JS = '1.0.56'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -199,6 +199,7 @@ class SDCardUploader
     await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
     await this.writer.write(this.packUint32LE(files.length));
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
     console.log(`✔️ 전송 성공: ${files.length}개의 파일`);
 
@@ -224,7 +225,7 @@ class SDCardUploader
 
       await this.sendFileMetadata(relativePath, fileSize);
 
-      console.log(`⌚검증 기다리기`);
+      // console.log(`⌚검증 기다리기`);
       try 
       {
         await this.waitForACK();
@@ -238,8 +239,9 @@ class SDCardUploader
         await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
         await this.writer.write(this.packUint32LE(files.length- send_file_index));
-        console.log(`✔️ ${send_file_index} 남은 갯수: ${files.length - send_file_index}개`);      
+        console.log(`✔️ ${send_file_index} 남은 갯수: ${files.length - send_file_index}개`);  
       }
+      await this.writer.write(this.packUint32LE(files.length- send_file_index));
     }
   }
 }
