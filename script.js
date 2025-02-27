@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.70'; 
+const VERSION_JS = '1.0.71'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -152,29 +152,32 @@ class SDCardUploader
 
     console.log(`📩 파일 전송 시작`);
 
-    while(retryCount < this.retryLimit) {
-      try {
+    while(retryCount < this.retryLimit) 
+    {
+      try 
+      {
         // 메타데이터 전송
         await this.sendFileMetadata(relativePath, fileSize);
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
         
         // 파일 데이터 전송
-        while(true) {
+        while(true) 
+        {
           const { done, value } = await fileReader.read();
           if(done)
           {
             console.log(`✔️ 파일 전송 완료`);
             break;
           }
-          await this.sendChunked(value);
-         
+          await this.sendChunked(value);         
         }
         
         // 최종 검증
-        await this.writer.write(new Uint8Array([0xCC])); // 검증 신호
-        return await this.waitForACK();
-        
-      } catch(error) {
+       // await this.writer.write(new Uint8Array([0xCC])); // 검증 신호
+        return await this.waitForACK();        
+      } 
+      catch(error) 
+      {
         //console.error(`전송 실패 (시도 ${retryCount+1}): ${error.message}`);
         if (error && error.message) {
           console.error(`전송 실패 (시도 ${retryCount+1}): ${error.message}`);
