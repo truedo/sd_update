@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.61'; 
+const VERSION_JS = '1.0.62'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -97,12 +97,12 @@ class SDCardUploader
     // 🔶 1. 경로 길이 전송
     await this.writer.write(this.packUint32LE(pathData.byteLength));
     await this.waitForACK();
-    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+   // await new Promise(resolve => setTimeout(resolve, SEND_TERM));
    // console.warn("경로 데이터 전송");
 
     // 🔶 2. 경로 데이터 전송
     await this.sendChunked(pathData);
-    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+   // await new Promise(resolve => setTimeout(resolve, SEND_TERM));
    // console.warn("파일 크기 전송");
 
     // 🔶 3. 크기 전송 (4바이트)
@@ -110,7 +110,7 @@ class SDCardUploader
     await this.writer.write(this.packUint32LE(fileSize));
   //  await this.writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
     await this.waitForACK();
-    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+  //  await new Promise(resolve => setTimeout(resolve, SEND_TERM));
   }
 
   // 청크 분할 전송 (파이썬 버퍼링 대응)
@@ -215,7 +215,7 @@ class SDCardUploader
       send_file_index += 1;
       //const relativePath = file.webkitRelativePath || file.name;
 
-      console.log(`✔️ ${send_file_index}: ${relativePath} 파일 이름`);
+      console.log(`✔️ ${send_file_index}: ${relativePath}`);
 
       // 📌 파일 크기 확인
       const fileUrl = BASE_URL + relativePath;        
