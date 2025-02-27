@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.65'; 
+const VERSION_JS = '1.0.66'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -26,6 +26,7 @@ class SDCardUploader
     this.port = null;
     this.reader = null;
     this.writer = null;
+    this.BAUD_RATE = 921600; // 웹 최적화 버퍼 크기
     this.BUFFER_SIZE = 64; // 웹 최적화 버퍼 크기
     this.retryLimit = 3;
     this.timeout = 1000; // 기본 타임아웃 1초
@@ -34,7 +35,7 @@ class SDCardUploader
   // 장치 연결
   async connect() {
     this.port = await navigator.serial.requestPort();
-    await this.port.open({ baudRate: 921600 });
+    await this.port.open({ baudRate: BAUD_RATE });
     [this.reader, this.writer] = [
       this.port.readable.getReader(),
       this.port.writable.getWriter()
