@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.77'; 
+const VERSION_JS = '1.0.78'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -29,14 +29,36 @@ class SDCardUploader
     this.timeout = 1000; // 기본 타임아웃 1초
   }
 
+//   async function connectSerial() {
+//     try {        
+//         port = await navigator.serial.requestPort();
+//         await port.open({ baudRate: BAUD_RATE });
+
+//         writer = port.writable.getWriter();
+//         reader = port.readable.getReader();
+
+//         console.log("✅ 주미 미니 연결 성공!");
+//     } catch (error) {
+//         console.error("❌ 주미 미니 연결 실패:", error);
+//     }
+// }
+
   // 장치 연결
   async connect() {
-    this.port = await navigator.serial.requestPort();
-    await this.port.open({ baudRate: BAUD_RATE });
-    [this.reader, this.writer] = [
-      this.port.readable.getReader(),
-      this.port.writable.getWriter()
-    ];
+    try 
+    {
+      this.port = await navigator.serial.requestPort();
+      await this.port.open({ baudRate: BAUD_RATE });
+      [this.reader, this.writer] = [
+        this.port.readable.getReader(),
+        this.port.writable.getWriter()        
+      ];
+      console.log("✅ 주미 미니 연결 성공!");
+    } 
+    catch (error) 
+    {
+      console.error("❌ 주미 미니 연결 실패:", error);
+    }
   }
 
   // 리틀 엔디언 변환 (파이썬 struct.pack 대응)
