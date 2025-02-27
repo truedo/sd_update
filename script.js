@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.64'; 
+const VERSION_JS = '1.0.65'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -274,24 +274,36 @@ const uploader = new SDCardUploader();
 
 async function validateFiles_all() 
 {   
+  const startTime = Date.now(); // ⏱ 전송 시작 시간 기록
+
   console.log(`ver ${VERSION_JS}`);
 
   const fileList = await loadFileList();
-  if (fileList.length === 0) {
+  if (fileList.length === 0) 
+  {
       console.log("❌ 전송할 파일이 없습니다.");
       return;
   }
+  try 
+  {
+    await uploader.connect();
+    await uploader.validateFiles(fileList);
+    console.log("🎉 모든 파일 전송 완료!");
+  } 
+  catch(error) 
+  {
+    console.error("❌ 전송 실패:", error);
+  }
 
-  try {
-      await uploader.connect();
-     // const files = await getFilesFromDirectory(); // 웹 디렉토리 접근
-      await uploader.validateFiles(fileList);
-      console.log("모든 파일 전송 완료!");
-    } catch(error) {
-      console.error("전송 실패:", error);
-    }
+  const endTime = Date.now(); // ⏱ 전송 종료 시간 기록
+  const elapsedTime = (endTime - startTime) / 1000; // 초 단위 변환
+  const minutes = Math.floor(elapsedTime / 60);
+  const seconds = Math.round(elapsedTime % 60);
 
+  console.log(`⏳ 총 소요 시간: ${minutes}분 ${seconds}초`);
 }
+
+
 
 
 async function connectSerial() {
