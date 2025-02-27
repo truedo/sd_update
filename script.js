@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.69'; 
+const VERSION_JS = '1.0.70'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -819,7 +819,7 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
     document.getElementById("selectedFileInfo").innerText = `📂 선택된 파일: ${selectedFile}`;
 
     console.log(`ver ${VERSION_JS}`);
-    await connectSerial(); // ESP32 연결
+   // await connectSerial(); // ESP32 연결
 
     document.getElementById("selectedfileStatus").innerText = "전송 중";
 
