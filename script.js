@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.68'; 
+const VERSION_JS = '1.0.69'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -826,6 +826,7 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
     const fileUrl = BASE_URL + selectedFile;
    // await sendFileToESP32(fileUrl, selectedFile, 0, 1); // 파일 전송 함수 실행
    // await SingleFileTransfer(fileUrl, selectedFile);
+    await uploader.connect();
     await uploader.sendFile(fileUrl, selectedFile);
     
 
