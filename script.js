@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.78'; 
+const VERSION_JS = '1.0.79'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -33,10 +33,8 @@ class SDCardUploader
 //     try {        
 //         port = await navigator.serial.requestPort();
 //         await port.open({ baudRate: BAUD_RATE });
-
 //         writer = port.writable.getWriter();
 //         reader = port.readable.getReader();
-
 //         console.log("✅ 주미 미니 연결 성공!");
 //     } catch (error) {
 //         console.error("❌ 주미 미니 연결 실패:", error);
@@ -106,12 +104,12 @@ class SDCardUploader
     // 🔶 1. 경로 길이 전송
     await this.writer.write(this.packUint32LE(pathData.byteLength));
     await this.waitForACK();
-   // await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
    // console.warn("경로 데이터 전송");
 
     // 🔶 2. 경로 데이터 전송
     await this.sendChunked(pathData);
-   // await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
    // console.warn("파일 크기 전송");
 
     // 🔶 3. 크기 전송 (4바이트)
@@ -262,6 +260,7 @@ class SDCardUploader
       catch(error) 
       {
         console.log(`❌ ${send_file_index} 검증 실패: ${relativePath}`);
+        await new Promise(resolve => setTimeout(resolve, SEND_TERM));
         await this.sendFile(fileUrl, relativePath); // 재전송
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
         await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
