@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.72'; 
+const VERSION_JS = '1.0.73'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -207,9 +207,12 @@ class SDCardUploader
   async validateFiles(files) {
     // 🔷 0-1. 검증 모드 신호 (0xCC) 1바이트
     await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
+    await this.waitForACK();
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
     // 🔷 0-2. 개수 전송 4바이트
     await this.writer.write(this.packUint32LE(files.length));
+    await this.waitForACK();
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
     console.log(`✔️ 전송 성공: ${files.length}개의 파일`);
