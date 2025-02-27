@@ -11,12 +11,11 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.76'; 
+const VERSION_JS = '1.0.77'; 
 
-// let BUFFER_SIZE = 64; // 버퍼 크기 설정
-// let SEND_TERM = 50; // 명령간의 텀
-// let FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
-//const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
+let BUFFER_SIZE = 64; // 버퍼 크기 설정
+let SEND_TERM = 50; // 명령간의 텀
+let FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
 
 
 class SDCardUploader 
@@ -28,9 +27,6 @@ class SDCardUploader
     this.BAUD_RATE = 921600; // 웹 최적화 버퍼 크기
     this.retryLimit = 3;
     this.timeout = 1000; // 기본 타임아웃 1초
-    this.BUFFER_SIZE = 64; // 웹 최적화 버퍼 크기
-    this.FILEDATA_TERM = 10;
-    this.SEND_TERM = 50;
   }
 
   // 장치 연결
@@ -107,9 +103,9 @@ class SDCardUploader
   // 청크 분할 전송 (파이썬 버퍼링 대응)
   async sendChunked(data) 
   {
-    for(let offset=0; offset<data.length; offset+=this.BUFFER_SIZE) 
+    for(let offset=0; offset<data.length; offset+=BUFFER_SIZE) 
     {
-      const chunk = data.slice(offset, offset+this.BUFFER_SIZE);
+      const chunk = data.slice(offset, offset+BUFFER_SIZE);
       await this.writer.write(chunk);
       await this.waitForACK();
       await new Promise(resolve => setTimeout(resolve, FILEDATA_TERM));
@@ -259,18 +255,6 @@ class SDCardUploader
 const uploader = new SDCardUploader();
 
 
-// // 사용 예시
-// const uploader = new SDCardUploader();
-// document.querySelector('#uploadBtn').addEventListener('click', async () => {
-//   try {
-//     await uploader.connect();
-//     const files = await getFilesFromDirectory(); // 웹 디렉토리 접근
-//     await uploader.validateFiles(files);
-//     console.log("모든 파일 전송 완료!");
-//   } catch(error) {
-//     console.error("전송 실패:", error);
-//   }
-// });
 
 async function validateFiles_all() 
 {   
@@ -323,6 +307,30 @@ async function loadFileList() {
     }
 }
 
+async function loadFileList2() {
+  try {
+      const response = await fetch("files.json"); // 🔹 파일 리스트 JSON 불러오기
+      if (!response.ok) throw new Error("파일 목록을 불러올 수 없습니다.");
+      
+      const fileList = await response.json();
+      const fileSelect = document.getElementById("fileList");
+
+      // 🔹 기존 옵션 초기화
+      fileSelect.innerHTML = "";
+      
+      fileList.forEach(file => {
+          const option = document.createElement("option");
+          option.value = file;
+          option.textContent = file;
+          fileSelect.appendChild(option);
+      });
+
+      fileSelect.disabled = false;
+  } catch (error) {
+      console.error("❌ 파일 목록 로드 실패:", error);
+  }
+}
+
 async function fetchFileWithRetry(url, retries = 3) {
     for (let attempt = 1; attempt <= retries; attempt++) {
        // console.log(`📥 서버 파일 다운로드 시도 ${attempt}/${retries}: ${url}`);
@@ -347,9 +355,6 @@ async function fetchFileWithRetry(url, retries = 3) {
     throw new Error("❌ 서버 파일 다운로드 실패: 모든 재시도 실패");
 }
 
-
-
-
 // 🔹 버퍼 크기 선택 시 업데이트
 document.getElementById("bufferSize").addEventListener("change", function() {
     BUFFER_SIZE = parseInt(this.value, 10); // 선택된 값 적용
@@ -363,13 +368,11 @@ document.getElementById("sendTerm").addEventListener("change", function() {
     document.getElementById("selectedsendTerm").innerText = `현재 설정된 전송 텀: ${SEND_TERM} ms`;
 });
 
-
 // 🔹 파일데이터 텀 선택 시 업데이트
 document.getElementById("fileDataTerm").addEventListener("change", function() {
     FILEDATA_TERM = parseInt(this.value, 10); // 선택된 값 적용
     document.getElementById("selectedfileDataTerm").innerText = `현재 설정된 파일데이터 텀: ${FILEDATA_TERM} ms`;
 });
-
 
 function updateProgress(currentIndex, totalFiles, filePath)
 {
@@ -387,34 +390,8 @@ function updateProgress(currentIndex, totalFiles, filePath)
         `📝 현재 파일: ${filePath}`;
 }
 
-
-async function loadFileList2() {
-    try {
-        const response = await fetch("files.json"); // 🔹 파일 리스트 JSON 불러오기
-        if (!response.ok) throw new Error("파일 목록을 불러올 수 없습니다.");
-        
-        const fileList = await response.json();
-        const fileSelect = document.getElementById("fileList");
-
-        // 🔹 기존 옵션 초기화
-        fileSelect.innerHTML = "";
-        
-        fileList.forEach(file => {
-            const option = document.createElement("option");
-            option.value = file;
-            option.textContent = file;
-            fileSelect.appendChild(option);
-        });
-
-        fileSelect.disabled = false;
-    } catch (error) {
-        console.error("❌ 파일 목록 로드 실패:", error);
-    }
-}
-
 // 🔹 페이지 로드 시 파일 목록 불러오기
 document.addEventListener("DOMContentLoaded", loadFileList2);
-
 
 document.getElementById("sendSelectedFile").addEventListener("click", async function() {
     const fileSelect = document.getElementById("fileList");
