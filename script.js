@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.57'; 
+const VERSION_JS = '1.0.58'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -98,16 +98,17 @@ class SDCardUploader
     // 경로 길이 전송
     await this.writer.write(this.packUint32LE(pathData.byteLength));
     await this.waitForACK();
-
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
    // console.warn("경로 데이터 전송");
 
     // 경로 데이터 전송
     await this.sendChunked(pathData);
-
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
    // console.warn("파일 크기 전송");
     // 파일 크기 전송
     await this.writer.write(this.packUint32LE(fileSize));
     await this.waitForACK();
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
   }
 
   // 청크 분할 전송 (파이썬 버퍼링 대응)
@@ -235,12 +236,11 @@ class SDCardUploader
       {
         console.log(`❌ ${send_file_index} 검증 실패: ${relativePath}`);
         await this.sendFile(fileUrl, relativePath); // 재전송
-
+        await new Promise(resolve => setTimeout(resolve, SEND_TERM));
         await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
         await this.writer.write(this.packUint32LE(files.length- send_file_index));
         console.log(`✔️ ${send_file_index} 남은 갯수: ${files.length - send_file_index}개`);  
-
       }
       await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
