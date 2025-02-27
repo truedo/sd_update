@@ -37,7 +37,7 @@
 <body>
 
     <h2>주미 미니 SD 파일 전송 검증 시스템</h2>
-    <button onclick="startTransfer()">파일 전송 시작</button>
+    <button onclick="validateFiles_all()">파일 전송 시작</button>
     <br>
 
     <label for="bufferSize">버퍼 크기 선택: </label>
@@ -103,9 +103,7 @@
     <!-- 진행 상태 텍스트 -->
     <p id="progressText">파일 검증 준비 중...</p>
 
-    <h2>파일 개별 전송</h2>
-    <button onclick="validateFiles_all()">테스트 전송 (첫 번째 파일)</button>
-    <br>
+
 
     <h2>파일 선택 전송</h2>
     <label for="fileList">전송할 파일 선택: </label>
