@@ -11,13 +11,12 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.75'; 
+const VERSION_JS = '1.0.76'; 
 
-let BUFFER_SIZE = 64; // 버퍼 크기 설정
-let SEND_TERM = 50; // 명령간의 텀
-let FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
-
-const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
+// let BUFFER_SIZE = 64; // 버퍼 크기 설정
+// let SEND_TERM = 50; // 명령간의 텀
+// let FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
+//const MAX_RETRIES_SEND = 3; // 최대 재전송 횟수
 
 
 class SDCardUploader 
@@ -54,19 +53,8 @@ class SDCardUploader
   // ACK 대기 (파이썬 ser.read(1) 대응)
   async waitForACK() 
   {
-    // console.log(`❓ ACK 대기중`);
-    // const { value } = await this.reader.read();
-    // const receivedByte = value[0];
-    // if(receivedByte === 0xE1) 
-    //   {
-    //     console.warn("✔️ACK 성공");
-    //     return true;
-    //   }
-    // if(receivedByte === 0xE2) throw new Error('CRC 오류');
-    // if(receivedByte === 0xE3) throw new Error('크기 불일치');
-
     while(true) 
-      {
+    {
       try 
       {
         const { value } = await Promise.race([
