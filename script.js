@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.62'; 
+const VERSION_JS = '1.0.63'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -106,7 +106,7 @@ class SDCardUploader
    // console.warn("파일 크기 전송");
 
     // 🔶 3. 크기 전송 (4바이트)
-    console.log(`📥 파일 크기: ${fileSize} bytes`);
+   // console.log(`📥 파일 크기: ${fileSize} bytes`);
     await this.writer.write(this.packUint32LE(fileSize));
   //  await this.writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
     await this.waitForACK();
@@ -235,7 +235,7 @@ class SDCardUploader
       try 
       {
         await this.waitForACK();
-        console.log(`✅ ${send_file_index} 검증 완료: ${relativePath}`);
+       // console.log(`✅ ${send_file_index} 검증 완료: ${relativePath}`);
       } 
       catch(error) 
       {
@@ -253,6 +253,8 @@ class SDCardUploader
   }
 }
 const uploader = new SDCardUploader();
+
+
 // // 사용 예시
 // const uploader = new SDCardUploader();
 // document.querySelector('#uploadBtn').addEventListener('click', async () => {
@@ -265,6 +267,27 @@ const uploader = new SDCardUploader();
 //     console.error("전송 실패:", error);
 //   }
 // });
+
+async function validateFiles_all() 
+{   
+  console.log(`ver ${VERSION_JS}`);
+
+  const fileList = await loadFileList();
+  if (fileList.length === 0) {
+      console.log("❌ 전송할 파일이 없습니다.");
+      return;
+  }
+
+  try {
+      await uploader.connect();
+     // const files = await getFilesFromDirectory(); // 웹 디렉토리 접근
+      await uploader.validateFiles(fileList);
+      console.log("모든 파일 전송 완료!");
+    } catch(error) {
+      console.error("전송 실패:", error);
+    }
+
+}
 
 
 async function connectSerial() {
