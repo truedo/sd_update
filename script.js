@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.83'; 
+const VERSION_JS = '1.0.84'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -318,6 +318,9 @@ async function validateFiles_all()
   {
     console.error("❌ 전송 실패:", error);
   }
+
+  await uploader.disconnect()
+
 
   const endTime = Date.now(); // ⏱ 전송 종료 시간 기록
   const elapsedTime = (endTime - startTime) / 1000; // 초 단위 변환
