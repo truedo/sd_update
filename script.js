@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.99'; 
+const VERSION_JS = '1.1.00'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -80,7 +80,7 @@ class SDCardUploader
   }
 
   async getVersion(value) {
-    try {
+    //try {
 
         if (value === 0) await this.writer.write(new Uint8Array([0xb0]));   
         else if (value === 1) await this.writer.write(new Uint8Array([0xb1]));   
@@ -110,10 +110,10 @@ class SDCardUploader
         }
        // console.log(`버전: ${new TextDecoder().decode(versionBuffer)}`);
         return new TextDecoder().decode(versionBuffer);
-    } 
+    // } 
     // finally 
     // {
-    //   await this.disconnect();
+    //   //await this.disconnect();
     // }
   }
 
