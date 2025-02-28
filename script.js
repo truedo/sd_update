@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.96'; 
+const VERSION_JS = '1.0.97'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -78,12 +78,13 @@ class SDCardUploader
     }
   }
 
-  async getVersion() {
+  async getVersion(value) {
     try {
 
-        console.log(`1 getVersion`);
-        // 0xBB 명령 전송
-        await this.writer.write(new Uint8Array([0xbb]));       
+        if (value === 0) await this.writer.write(new Uint8Array([0xb0]));   
+        else if (value === 1) await this.writer.write(new Uint8Array([0xb1]));   
+        else if (value === 2) await this.writer.write(new Uint8Array([0xb2]));   
+
         
         // 버전 길이 수신 (4바이트 리틀 엔디언)
         const lenBuffer = new Uint8Array(4);
@@ -94,9 +95,7 @@ class SDCardUploader
             received += value.length;
         }
         const length = new DataView(lenBuffer.buffer).getUint32(0, true);
-
-
-        console.log(`버전 길이: ${length}`);
+       // console.log(`버전 길이: ${length}`);
         
         // 버전 문자열 수신
         let version = '';
@@ -108,15 +107,13 @@ class SDCardUploader
             versionBuffer.set(value.subarray(0, remain), received);
             received += value.length;
         }
-
-        console.log(`버전: ${new TextDecoder().decode(versionBuffer)}`);
+       // console.log(`버전: ${new TextDecoder().decode(versionBuffer)}`);
         return new TextDecoder().decode(versionBuffer);
         
     } 
     finally 
     {
-      console.log(`종료`);
-        await this.disconnect();
+      await this.disconnect();
     }
   }
 
@@ -520,7 +517,7 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
 document.getElementById('versionBtn').addEventListener('click', async () => {
   
     await uploader.connect()
-    const version = await uploader.getVersion();
+    const version = await uploader.getVersion(0);
     document.getElementById('versionDisplay').textContent = `펌웨어 버전: ${version}`;
 
 
