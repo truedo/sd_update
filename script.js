@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.86'; 
+const VERSION_JS = '1.0.87'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -434,8 +434,8 @@ function updateProgress(currentIndex, totalFiles, filePath)
     const percent = Math.round((currentIndex / totalFiles) * 100);
     
     // 진행 바 업데이트
-    document.getElementById("progressBar").style.width = percent + "%";
-
+    //document.getElementById("progressBar").style.width = percent + "%";
+    document.getElementById("progressBar").style.width = percent + "px";
     // 진행 상태 텍스트 업데이트
     document.getElementById("progressText").innerText =
         `📂 진행 중: ${currentIndex}/${totalFiles} 파일 완료 (${percent}%)\n` +
