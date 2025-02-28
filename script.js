@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.92'; 
+const VERSION_JS = '1.0.93'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -512,17 +512,23 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
 });
 
 document.getElementById('versionBtn').addEventListener('click', async () => {
-  if (await uploader.connect()) 
-    {
-      try 
-      {
-          const version = await uploader.getVersion();
-          document.getElementById('versionDisplay').textContent = 
-              `펌웨어 버전: ${version}`;
-      } 
-      catch (error) 
-      {
-          console.error("Version check failed:", error);
-      }
-  }
+  
+    await uploader.connect()
+    const version = await uploader.getVersion();
+    document.getElementById('versionDisplay').textContent = `펌웨어 버전: ${version}`;
+
+
+  // if (await uploader.connect()) 
+  //   {
+  //     try 
+  //     {
+  //         const version = await uploader.getVersion();
+  //         document.getElementById('versionDisplay').textContent = 
+  //             `펌웨어 버전: ${version}`;
+  //     } 
+  //     catch (error) 
+  //     {
+  //         console.error("Version check failed:", error);
+  //     }
+  // }
 });
