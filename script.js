@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.94'; 
+const VERSION_JS = '1.0.95'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -108,7 +108,7 @@ class SDCardUploader
             versionBuffer.set(value.subarray(0, remain), received);
             received += value.length;
         }
-        console.log(`버전: ${extDecoder().decode(versionBuffer)}`);
+        console.log(`버전: ${TextDecoder().decode(versionBuffer)}`);
         return new TextDecoder().decode(versionBuffer);
         
     } 
