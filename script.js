@@ -11,12 +11,15 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.03'; 
+const VERSION_JS = '1.1.04'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
 let FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
 
+const version_main = null;
+const version_hw = null;
+const version_sd = null;
 
 class SDCardUploader 
 {
@@ -542,21 +545,20 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
 document.getElementById('versionBtn').addEventListener('click', async () => {
   
     await uploader.connect();
-    await uploader.connect();
-    const version_main = await uploader.getVersion(0);
+    version_main = await uploader.getVersion(0);
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
-    const version_hw = await uploader.getVersion(1);
+    version_hw = await uploader.getVersion(1);
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
-    const version_sd = await uploader.getVersion(2);
+    version_sd = await uploader.getVersion(2);
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
     document.getElementById('versionDisplay').textContent 
     = `펌웨어 버전: main: ${version_main} HW:${version_hw} SD:${version_sd}`;
 
-
     await uploader.disconnect()
+
 
   // if (await uploader.connect()) 
   //   {
