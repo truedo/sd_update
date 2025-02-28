@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.02'; 
+const VERSION_JS = '1.1.03'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -59,7 +59,7 @@ class SDCardUploader
     // }
 
     if (this.port && this.port.readable && this.port.writable) {
-      console.log("⚠️ 주미 미니 포트가 이미 연결되어 있습니다!");
+      console.log("⚠️ 포트가 이미 연결되어 있음!");
       return;
     }
     
@@ -78,7 +78,12 @@ class SDCardUploader
   }
 
   async disconnect() {
-    try {
+    try {    
+      if (!this.port) {
+          console.warn("⚠️ 포트가 연결되어 있지 않음!");
+          return;
+      }
+
       if (this.reader) {
         await this.reader.cancel();
         this.reader = null;
@@ -92,7 +97,9 @@ class SDCardUploader
         this.port = null;
       }
       console.log("✅ 주미 미니 포트 연결: 종료!");
-    } catch (error) {
+    } 
+    catch (error) 
+    {
       console.error("❌ 포트 닫기 오류:", error);
     }
   }
