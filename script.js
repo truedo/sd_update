@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.98'; 
+const VERSION_JS = '1.0.99'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -110,12 +110,11 @@ class SDCardUploader
         }
        // console.log(`버전: ${new TextDecoder().decode(versionBuffer)}`);
         return new TextDecoder().decode(versionBuffer);
-        
     } 
-    finally 
-    {
-      await this.disconnect();
-    }
+    // finally 
+    // {
+    //   await this.disconnect();
+    // }
   }
 
   // 리틀 엔디언 변환 (파이썬 struct.pack 대응)
@@ -517,20 +516,23 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
 
 document.getElementById('versionBtn').addEventListener('click', async () => {
   
-    await uploader.connect()
+    await uploader.connect();
+
+
     const version_main = await uploader.getVersion(0);
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
-    
     const version_hw = await uploader.getVersion(1);
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
-
 
     const version_sd = await uploader.getVersion(2);
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
     document.getElementById('versionDisplay').textContent 
     = `펌웨어 버전: main: ${version_main} HW:${version_hw} SD:${version_sd}`;
+
+
+    await uploader.disconnect()
 
   // if (await uploader.connect()) 
   //   {
