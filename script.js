@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.00'; 
+const VERSION_JS = '1.1.01'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -486,6 +486,26 @@ function updateProgress(currentIndex, totalFiles, filePath)
 // 🔹 페이지 로드 시 파일 목록 불러오기
 document.addEventListener("DOMContentLoaded", loadFileList2);
 
+// 🔹 페이지 로드 시 버전 요청해서 받아오기
+document.addEventListener('DOMContentLoaded', async () => {
+  await uploader.connect();
+
+  const version_main = await uploader.getVersion(0);
+  await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+  const version_hw = await uploader.getVersion(1);
+  await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+  const version_sd = await uploader.getVersion(2);
+  await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+  document.getElementById('versionDisplay').textContent 
+  = `펌웨어 버전: main: ${version_main} HW:${version_hw} SD:${version_sd}`;
+
+  await uploader.disconnect();
+});
+
+
 document.getElementById("sendSelectedFile").addEventListener("click", async function() {
     const fileSelect = document.getElementById("fileList");
     const selectedFile = fileSelect.value;
@@ -513,6 +533,9 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
 
 
 });
+
+
+
 
 document.getElementById('versionBtn').addEventListener('click', async () => {
   
