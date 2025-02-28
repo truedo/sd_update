@@ -72,7 +72,7 @@ class SDCardUploader
       if (this.port) {
         await this.port.close();
         this.port = null;
-      }포트
+      }
       console.log("✅ 주미 미니 포트 연결: 종료!");
     } catch (error) {
       console.error("❌ 포트 닫기 오류:", error);
