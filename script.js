@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.90'; 
+const VERSION_JS = '1.0.91'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -508,9 +508,9 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
 });
 
 document.getElementById('versionBtn').addEventListener('click', async () => {
-  if (await serialMgr.connect()) {
+  if (await uploader.connect()) {
       try {
-          const version = await serialMgr.getVersion();
+          const version = await uploader.getVersion();
           document.getElementById('versionDisplay').textContent = 
               `펌웨어 버전: ${version}`;
       } catch (error) {
