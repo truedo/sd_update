@@ -11,15 +11,15 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.04'; 
+const VERSION_JS = '1.1.05'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
 let FILEDATA_TERM = 10; //쪼개서 보내는 파일 데이터 텀
 
-const version_main = null;
-const version_hw = null;
-const version_sd = null;
+let version_main = null;
+let version_hw = null;
+let version_sd = null;
 
 class SDCardUploader 
 {
