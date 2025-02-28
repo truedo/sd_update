@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.91'; 
+const VERSION_JS = '1.0.92'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -80,8 +80,12 @@ class SDCardUploader
 
   async getVersion() {
     try {
+
+        console.log(`1 getVersion`);
         // 0xBB 명령 전송
         await this.writer.write(new Uint8Array([0xbb]));
+
+        console.log(`2 getVersion`);
         
         // 버전 길이 수신 (4바이트 리틀 엔디언)
         const lenBuffer = new Uint8Array(4);
@@ -508,12 +512,16 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
 });
 
 document.getElementById('versionBtn').addEventListener('click', async () => {
-  if (await uploader.connect()) {
-      try {
+  if (await uploader.connect()) 
+    {
+      try 
+      {
           const version = await uploader.getVersion();
           document.getElementById('versionDisplay').textContent = 
               `펌웨어 버전: ${version}`;
-      } catch (error) {
+      } 
+      catch (error) 
+      {
           console.error("Version check failed:", error);
       }
   }
