@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.81'; 
+const VERSION_JS = '1.0.83'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -26,7 +26,7 @@ class SDCardUploader
     this.writer = null;
     this.BAUD_RATE = 921600; // 웹 최적화 버퍼 크기
     this.retryLimit = 3;
-    this.timeout = 1000; // 기본 타임아웃 1초
+    this.timeout = 2000; // 기본 타임아웃 1초
   }
 
 //   async function connectSerial() {
@@ -56,6 +56,25 @@ class SDCardUploader
     catch (error) 
     {
       console.error("❌ 주미 미니 연결 실패:", error);
+    }
+  }
+
+  async disconnect() {
+    try {
+      if (this.reader) {
+        await this.reader.cancel();
+        this.reader = null;
+      }
+      if (this.writer) {
+        await this.writer.close();
+        this.writer = null;
+      }
+      if (this.port) {
+        await this.port.close();
+        this.port = null;
+      }
+    } catch (error) {
+      console.error("포트 닫기 오류:", error);
     }
   }
 
@@ -433,7 +452,11 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
 
     await uploader.connect();
     await uploader.sendFile(fileUrl, selectedFile);
+
+    await uploader.disconnect()
     
 
     document.getElementById("selectedfileStatus").innerText = "전송 완료!";
+
+
 });
