@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.89'; 
+const VERSION_JS = '1.0.90'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -75,6 +75,38 @@ class SDCardUploader
       }
     } catch (error) {
       console.error("포트 닫기 오류:", error);
+    }
+  }
+
+  async getVersion() {
+    try {
+        // 0xBB 명령 전송
+        await this.writer.write(new Uint8Array([0xbb]));
+        
+        // 버전 길이 수신 (4바이트 리틀 엔디언)
+        const lenBuffer = new Uint8Array(4);
+        let received = 0;
+        while (received < 4) {
+            const { value } = await this.reader.read();
+            lenBuffer.set(value.subarray(0, 4 - received), received);
+            received += value.length;
+        }
+        const length = new DataView(lenBuffer.buffer).getUint32(0, true);
+        
+        // 버전 문자열 수신
+        let version = '';
+        received = 0;
+        const versionBuffer = new Uint8Array(length);
+        while (received < length) {
+            const { value } = await this.reader.read();
+            const remain = length - received;
+            versionBuffer.set(value.subarray(0, remain), received);
+            received += value.length;
+        }
+        return new TextDecoder().decode(versionBuffer);
+        
+    } finally {
+        await this.disconnect();
     }
   }
 
@@ -329,6 +361,8 @@ async function validateFiles_all()
 }
 
 
+
+
 async function sendHWFirmInput() 
 {
   await uploader.connect();
@@ -471,4 +505,16 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
     document.getElementById("selectedfileStatus").innerText = "전송 완료!";
 
 
+});
+
+document.getElementById('versionBtn').addEventListener('click', async () => {
+  if (await serialMgr.connect()) {
+      try {
+          const version = await serialMgr.getVersion();
+          document.getElementById('versionDisplay').textContent = 
+              `펌웨어 버전: ${version}`;
+      } catch (error) {
+          console.error("Version check failed:", error);
+      }
+  }
 });
