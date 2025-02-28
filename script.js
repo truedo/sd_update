@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.05'; 
+const VERSION_JS = '1.1.06'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -558,6 +558,21 @@ document.getElementById('versionBtn').addEventListener('click', async () => {
     = `펌웨어 버전: main: ${version_main} HW:${version_hw} SD:${version_sd}`;
 
     await uploader.disconnect()
+
+
+
+// 문자열 버전을 숫자로 변환
+let version_main_number = parseFloat(version_main);
+let version_compare = 1.24;
+
+// 비교
+if (version_main_number > version_compare) {
+    console.log(`${version_main}은 ${version_compare}보다 큽니다.`);
+} else if (version_main_number < version_compare) {
+    console.log(`${version_main}은 ${version_compare}보다 작습니다.`);
+} else {
+    console.log(`${version_main}은 ${version_compare}과 동일합니다.`);
+}
 
 
   // if (await uploader.connect()) 
