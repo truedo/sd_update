@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.97'; 
+const VERSION_JS = '1.0.98'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -51,11 +51,11 @@ class SDCardUploader
         this.port.readable.getReader(),
         this.port.writable.getWriter()        
       ];
-      console.log("✅ 주미 미니 연결 성공!");
+      console.log("✅ 주미 미니 포트 연결: 성공!");
     } 
     catch (error) 
     {
-      console.error("❌ 주미 미니 연결 실패:", error);
+      console.error("❌ 주미 미니 포트 연결: 실패:", error);
     }
   }
 
@@ -72,9 +72,10 @@ class SDCardUploader
       if (this.port) {
         await this.port.close();
         this.port = null;
-      }
+      }포트
+      console.log("✅ 주미 미니 포트 연결: 종료!");
     } catch (error) {
-      console.error("포트 닫기 오류:", error);
+      console.error("❌ 포트 닫기 오류:", error);
     }
   }
 
@@ -517,9 +518,19 @@ document.getElementById("sendSelectedFile").addEventListener("click", async func
 document.getElementById('versionBtn').addEventListener('click', async () => {
   
     await uploader.connect()
-    const version = await uploader.getVersion(0);
-    document.getElementById('versionDisplay').textContent = `펌웨어 버전: ${version}`;
+    const version_main = await uploader.getVersion(0);
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
+    
+    const version_hw = await uploader.getVersion(1);
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+
+    const version_sd = await uploader.getVersion(2);
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+    document.getElementById('versionDisplay').textContent 
+    = `펌웨어 버전: main: ${version_main} HW:${version_hw} SD:${version_sd}`;
 
   // if (await uploader.connect()) 
   //   {
