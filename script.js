@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.85'; 
+const VERSION_JS = '1.0.86'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -333,7 +333,7 @@ async function sendHWFirmInput()
 {
   await uploader.connect();
 
-  await this.writer.write(new Uint8Array([0xDD])); // 검증 모드
+  await uploader.writer.write(new Uint8Array([0xDD])); // 검증 모드
   await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
   await uploader.disconnect()
