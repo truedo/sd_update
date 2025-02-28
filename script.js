@@ -99,7 +99,7 @@ class SDCardUploader
         await this.port.close();
         this.port = null;
       }
-      console.log("✅ 주미 미니 포트 연결: 종료!");
+      console.log("🔚 주미 미니 포트 연결: 종료!");
     } 
     catch (error) 
     {
@@ -561,31 +561,17 @@ document.getElementById('versionBtn').addEventListener('click', async () => {
 
 
 
-// 문자열 버전을 숫자로 변환
-let version_main_number = parseFloat(version_main);
-let version_compare = 1.24;
+    
+// // 문자열 버전을 숫자로 변환
+// let version_main_number = parseFloat(version_main);
+// let version_compare = 1.24;
+// // 비교
+// if (version_main_number > version_compare) {
+//     console.log(`${version_main}은 ${version_compare}보다 큽니다.`);
+// } else if (version_main_number < version_compare) {
+//     console.log(`${version_main}은 ${version_compare}보다 작습니다.`);
+// } else {
+//     console.log(`${version_main}은 ${version_compare}과 동일합니다.`);
+// }
 
-// 비교
-if (version_main_number > version_compare) {
-    console.log(`${version_main}은 ${version_compare}보다 큽니다.`);
-} else if (version_main_number < version_compare) {
-    console.log(`${version_main}은 ${version_compare}보다 작습니다.`);
-} else {
-    console.log(`${version_main}은 ${version_compare}과 동일합니다.`);
-}
-
-
-  // if (await uploader.connect()) 
-  //   {
-  //     try 
-  //     {
-  //         const version = await uploader.getVersion();
-  //         document.getElementById('versionDisplay').textContent = 
-  //             `펌웨어 버전: ${version}`;
-  //     } 
-  //     catch (error) 
-  //     {
-  //         console.error("Version check failed:", error);
-  //     }
-  // }
 });
