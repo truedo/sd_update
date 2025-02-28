@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.0.84'; 
+const VERSION_JS = '1.0.85'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -294,8 +294,6 @@ class SDCardUploader
 }
 const uploader = new SDCardUploader();
 
-
-
 async function validateFiles_all() 
 {   
   const startTime = Date.now(); // ⏱ 전송 시작 시간 기록
@@ -328,6 +326,17 @@ async function validateFiles_all()
   const seconds = Math.round(elapsedTime % 60);
 
   console.log(`⏳ 총 소요 시간: ${minutes}분 ${seconds}초`);
+}
+
+
+async function sendHWFirmInput() 
+{
+  await uploader.connect();
+
+  await this.writer.write(new Uint8Array([0xDD])); // 검증 모드
+  await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+  await uploader.disconnect()
 }
 
 
