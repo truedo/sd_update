@@ -1,9 +1,9 @@
-// const GITHUB_USER = "truedo";
-// const REPO_NAME = "sd_update";
-// const BRANCH = "main";
-// const BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${BRANCH}/sd_update_files/`;
+const GITHUB_USER = "truedo";
+const REPO_NAME = "sd_update";
+const BRANCH = "main";
+const BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/${BRANCH}/sd_update_files/`;
 
-const BASE_URL = 'https://startling-tanuki-ea7c77.netlify.app/';
+//const BASE_URL = 'https://startling-tanuki-ea7c77.netlify.app/';
 
 let port;
 let writer;
