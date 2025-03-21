@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.07'; 
+const VERSION_JS = '1.1.08'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -187,6 +187,8 @@ class SDCardUploader
     const convertedPath = relativePath.replace(/\\/g, '/');
     const pathData = new TextEncoder().encode(convertedPath);
 
+    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+    
     // 🔶 1. 경로 길이 전송
     await this.writer.write(this.packUint32LE(pathData.byteLength));
     await this.waitForACK();
@@ -224,7 +226,7 @@ class SDCardUploader
     // const fileSize = file.size;
     // const fileReader = file.stream().getReader();
 
-    await this.writer.write(new Uint8Array([0xee])); // 검증 모드
+    await this.writer.write(new Uint8Array([0xee])); // 전송 모드
     await this.waitForACK();
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
