@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.08'; 
+const VERSION_JS = '1.1.09'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -29,7 +29,7 @@ class SDCardUploader
     this.writer = null;
     this.BAUD_RATE = 921600; // 웹 최적화 버퍼 크기
     this.retryLimit = 3;
-    this.timeout = 2000; // 기본 타임아웃 1초
+    this.timeout = 3000; // 기본 타임아웃 1초
   }
 
 //   async function connectSerial() {
@@ -187,8 +187,6 @@ class SDCardUploader
     const convertedPath = relativePath.replace(/\\/g, '/');
     const pathData = new TextEncoder().encode(convertedPath);
 
-    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
-    
     // 🔶 1. 경로 길이 전송
     await this.writer.write(this.packUint32LE(pathData.byteLength));
     await this.waitForACK();
