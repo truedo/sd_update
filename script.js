@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.15'; 
+const VERSION_JS = '1.1.16'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -349,16 +349,18 @@ class SDCardUploader
       {
         console.log(`❌ ${send_file_index} 검증 실패: ${relativePath}`);
 //await new Promise(resolve => setTimeout(resolve, SEND_TERM));
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise(resolve => setTimeout(resolve, 3000));
 
         await this.sendFile(fileUrl, relativePath); // 재전송
 //await new Promise(resolve => setTimeout(resolve, SEND_TERM));
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise(resolve => setTimeout(resolve, 3000));
+
+console.log(` 재시작 CC`);
 
         await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
         await this.waitForACK();
 //await new Promise(resolve => setTimeout(resolve, SEND_TERM));
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise(resolve => setTimeout(resolve, 3000));
 
 
         await this.writer.write(this.packUint32LE(files.length- send_file_index));
