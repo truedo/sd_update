@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.06'; 
+const VERSION_JS = '1.1.07'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -402,12 +402,23 @@ async function sendHWFirmInput()
 {
   await uploader.connect();
 
-  await uploader.writer.write(new Uint8Array([0xDD])); // 검증 모드
+  console.log(`📩 HW 펌웨어 입력 시작`);
+  await uploader.writer.write(new Uint8Array([0xDD])); // HW 펌웨어 입력 모드
   await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
   await uploader.disconnect()
 }
 
+
+async function sendMainFirmInput() 
+{
+  await uploader.connect();
+  console.log(`📩 Main 펌웨어 입력 시작`);
+  await uploader.writer.write(new Uint8Array([0xAA])); // MAIN 펌웨어 입력 모드
+  await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+  await uploader.disconnect()
+}
 
 
 
