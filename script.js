@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.16'; 
+const VERSION_JS = '1.1.17'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -191,20 +191,25 @@ class SDCardUploader
     console.log(`경로 길이 :${pathData.byteLength}`);
     await this.writer.write(this.packUint32LE(pathData.byteLength));
     await this.waitForACK();
-    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+    //await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+await new Promise(resolve => setTimeout(resolve, 3000));
+
    // console.warn("경로 데이터 전송");
 
    
     // 🔶 2. 경로 데이터 전송
     await this.sendChunked(pathData);
-    await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+    //await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+await new Promise(resolve => setTimeout(resolve, 3000));
+
    // console.warn("파일 크기 전송");
 
     // 🔶 3. 크기 전송 (4바이트)
    // console.log(`📥 파일 크기: ${fileSize} bytes`);
     await this.writer.write(this.packUint32LE(fileSize));
   //  await this.writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
-    await this.waitForACK();
+  console.log(`⌚검증 기다리기1`);
+  await this.waitForACK();
   //  await new Promise(resolve => setTimeout(resolve, SEND_TERM));
   }
 
@@ -342,6 +347,7 @@ class SDCardUploader
       //console.log(`⌚검증 기다리기`);
       try 
       {
+        console.log(`⌚검증 기다리기2`);
         await this.waitForACK();
        // console.log(`✅ ${send_file_index} 검증 완료: ${relativePath}`);
       } 
