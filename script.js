@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.12'; 
+const VERSION_JS = '1.1.13'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -204,7 +204,7 @@ class SDCardUploader
    // console.log(`📥 파일 크기: ${fileSize} bytes`);
     await this.writer.write(this.packUint32LE(fileSize));
   //  await this.writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
-    await this.waitForACK();
+  //  await this.waitForACK();
   //  await new Promise(resolve => setTimeout(resolve, SEND_TERM));
   }
 
