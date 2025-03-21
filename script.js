@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.17'; 
+const VERSION_JS = '1.1.18'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -347,8 +347,8 @@ await new Promise(resolve => setTimeout(resolve, 3000));
       //console.log(`⌚검증 기다리기`);
       try 
       {
-        console.log(`⌚검증 기다리기2`);
-        await this.waitForACK();
+       // console.log(`⌚검증 기다리기2`);
+       // await this.waitForACK();
        // console.log(`✅ ${send_file_index} 검증 완료: ${relativePath}`);
       } 
       catch(error) 
