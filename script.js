@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.15'; 
+const VERSION_JS = '1.1.09'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -161,8 +161,7 @@ class SDCardUploader
       {
         const { value } = await Promise.race([
           this.reader.read(),
-          new Promise((_, r) => 
-            setTimeout(r, this.timeout))
+          new Promise((_, r) => setTimeout(r, this.timeout))
             .then(() => { throw new Error('ACK 타임아웃') })
         ]);
         const receivedByte = value[0];
@@ -181,48 +180,6 @@ class SDCardUploader
       }
     }
   }
-  // async waitForACK() 
-  // {
-  //   while (true) 
-  //     {
-  //     try {
-  //       // read()와 타임아웃 프로미스를 동시에 실행
-  //       const { value, done } = await Promise.race([
-  //         this.reader.read(),
-  //         new Promise((_, reject) =>
-  //           setTimeout(() => reject(new Error('ACK 타임아웃')), this.timeout)
-  //         )
-  //       ]);
-        
-  //       // 스트림이 종료된 경우
-  //       if (done) {
-  //         throw new Error('스트림이 종료되었습니다.');
-  //       }
-  
-  //       // value가 유효한지 확인
-  //       if (!value || value.length === 0) {
-  //         throw new Error('수신 데이터가 없습니다.');
-  //       }
-  
-  //       const receivedByte = value[0];
-  //       if (receivedByte === 0xE1) return true;
-  //       if (receivedByte === 0xE2) throw new Error('크기 불일치');
-  //       if (receivedByte === 0xE3) throw new Error('파일 없음');
-  
-  //       // 필요에 따라 다른 데이터 처리 로직 추가 가능
-  //     } catch (error) {
-  //       console.error(`ACK 오류: ${error.message || '알 수 없는 오류 발생'}`);
-        
-  //       // 필요한 경우 reader나 스트림 재설정 로직 추가
-  //       // 예시: await this.resetReader(); // 재설정 함수가 있다면 호출
-  
-  //       throw error;
-  //     }
-  //   }
-  // }
-
-
-
 
   // 파일 메타데이터 전송 (파이썬 send_file 구조 대응)
   async sendFileMetadata(relativePath, fileSize) 
@@ -245,7 +202,7 @@ class SDCardUploader
    // console.log(`📥 파일 크기: ${fileSize} bytes`);
     await this.writer.write(this.packUint32LE(fileSize));
   //  await this.writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
-   // await this.waitForACK();
+    await this.waitForACK();
   //  await new Promise(resolve => setTimeout(resolve, SEND_TERM));
   }
 
@@ -267,19 +224,14 @@ class SDCardUploader
     // const fileSize = file.size;
     // const fileReader = file.stream().getReader();
 
-await new Promise(resolve => setTimeout(resolve, 2000)); ////////////////
-
     await this.writer.write(new Uint8Array([0xee])); // 검증 모드
     await this.waitForACK();
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
-await new Promise(resolve => setTimeout(resolve, 2000)); ////////////////
 
     // 🔷 0-2. 파일 개수 전송 4바이트
     await this.writer.write(this.packUint32LE(1));
     await this.waitForACK();
-await new Promise(resolve => setTimeout(resolve, 2000)); ////////////////
-
     // console.log(`✔️ 전송 성공: 1 개의 파일`);
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
@@ -301,7 +253,6 @@ await new Promise(resolve => setTimeout(resolve, 2000)); ////////////////
       {
         // 메타데이터 전송
         await this.sendFileMetadata(relativePath, fileSize);
-        await this.waitForACK();
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
         
         // 파일 데이터 전송
@@ -396,19 +347,13 @@ await new Promise(resolve => setTimeout(resolve, 2000)); ////////////////
       {
         console.log(`❌ ${send_file_index} 검증 실패: ${relativePath}`);
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
-        
-        await this.sendFile(fileUrl, relativePath); // 파일 전송 
+        await this.sendFile(fileUrl, relativePath); // 재전송
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
-
         await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
         await this.waitForACK();
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
-
-        
-
         await this.writer.write(this.packUint32LE(files.length- send_file_index));
         await this.waitForACK();
-
         console.log(`✔️ ${send_file_index} 남은 갯수: ${files.length - send_file_index}개`);  
       }
       await new Promise(resolve => setTimeout(resolve, SEND_TERM));
