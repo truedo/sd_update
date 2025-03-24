@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.10'; 
+const VERSION_JS = '1.1.11'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -345,7 +345,7 @@ await new Promise(resolve => setTimeout(resolve, 2000)); ////////////////
       //console.log(`⌚검증 기다리기`);
       try 
       {
-        await this.waitForACK();
+       //  await this.waitForACK();
        // console.log(`✅ ${send_file_index} 검증 완료: ${relativePath}`);
       } 
       catch(error) 
@@ -359,6 +359,8 @@ await new Promise(resolve => setTimeout(resolve, 2000)); ////////////////
         await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
         await this.waitForACK();
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+        
 
         await this.writer.write(this.packUint32LE(files.length- send_file_index));
         await this.waitForACK();
