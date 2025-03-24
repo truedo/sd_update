@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.10'; 
+const VERSION_JS = '1.1.11'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -152,34 +152,66 @@ class SDCardUploader
     return new Uint8Array(buffer);
   }
 
-  // ACK 대기 (파이썬 ser.read(1) 대응)
-  async waitForACK() 
-  {
-    while(true) 
-    {
-      try 
-      {
-        const { value } = await Promise.race([
-          this.reader.read(),
-          new Promise((_, r) => setTimeout(r, this.timeout))
-            .then(() => { throw new Error('ACK 타임아웃') })
-        ]);
-        const receivedByte = value[0];
-        if(receivedByte === 0xE1) return true;
-        if(receivedByte === 0xE2) throw new Error('크기 불일치');
-        if(receivedByte === 0xE3) throw new Error('파일 없음');
-      } 
-      catch(error) 
-      {
-        if (error && error.message) {
-          console.error(`ACK 오류: ${error.message}`);
-        } else {
-          console.error('ACK 오류: 알 수 없는 오류 발생');
-        }  
-        throw error;
-      }
+  // // ACK 대기 (파이썬 ser.read(1) 대응)
+  // async waitForACK() 
+  // {
+  //   while(true) 
+  //   {
+  //     try 
+  //     {
+  //       const { value } = await Promise.race([
+  //         this.reader.read(),
+  //         new Promise((_, r) => setTimeout(r, this.timeout))
+  //           .then(() => { throw new Error('ACK 타임아웃') })
+  //       ]);
+  //       const receivedByte = value[0];
+  //       if(receivedByte === 0xE1) return true;
+  //       if(receivedByte === 0xE2) throw new Error('크기 불일치');
+  //       if(receivedByte === 0xE3) throw new Error('파일 없음');
+  //     } 
+  //     catch(error) 
+  //     {
+  //       if (error && error.message) {
+  //         console.error(`ACK 오류: ${error.message}`);
+  //       } else {
+  //         console.error('ACK 오류: 알 수 없는 오류 발생');
+  //       }  
+  //       throw error;
+  //     }
+  //   }
+  // }
+
+  async waitForACK() {
+    const { value } = await this.reader.read();
+  
+    if (!value || value.length === 0) {
+      console.error('수신 데이터가 없습니다.');
+      throw new Error('수신 데이터가 없습니다.');
     }
+  
+    const receivedByte = value[0];
+    if (receivedByte === 0xE1) {
+      // 정상 ACK
+      return true;
+    }
+    if (receivedByte === 0xE2) {
+      console.error('크기 불일치');
+      throw new Error('크기 불일치');
+    }
+    if (receivedByte === 0xE3) {
+      console.error('파일 없음');
+      throw new Error('파일 없음');
+    }
+  
+    console.error('알 수 없는 ACK 데이터');
+    throw new Error('알 수 없는 ACK 데이터');
   }
+
+
+
+
+
+
 
   // 파일 메타데이터 전송 (파이썬 send_file 구조 대응)
   async sendFileMetadata(relativePath, fileSize) 
