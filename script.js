@@ -351,7 +351,8 @@ class SDCardUploader
       if (receivedByte === 0xE1) 
       {
         // 정상 ACK
-      //  return true;
+        //  return true;
+        console.error('정상');
       }
       else
       {
