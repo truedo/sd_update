@@ -11,7 +11,7 @@ let reader;
 const BAUD_RATE = 921600;
 const TIMEOUT = 3000; // ms
 
-const VERSION_JS = '1.1.09'; 
+const VERSION_JS = '1.1.10'; 
 
 let BUFFER_SIZE = 64; // 버퍼 크기 설정
 let SEND_TERM = 50; // 명령간의 텀
@@ -191,15 +191,15 @@ class SDCardUploader
     await this.writer.write(this.packUint32LE(pathData.byteLength));
     await this.waitForACK();
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
-   // console.warn("경로 데이터 전송");
+    console.warn("경로 데이터 전송");
 
     // 🔶 2. 경로 데이터 전송
     await this.sendChunked(pathData);
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
-   // console.warn("파일 크기 전송");
+    console.warn("파일 크기 전송");
 
     // 🔶 3. 크기 전송 (4바이트)
-   // console.log(`📥 파일 크기: ${fileSize} bytes`);
+    console.log(`📥 파일 크기: ${fileSize} bytes`);
     await this.writer.write(this.packUint32LE(fileSize));
   //  await this.writer.write(new Uint8Array(new Uint32Array([fileSize]).buffer));
     await this.waitForACK();
@@ -299,11 +299,15 @@ class SDCardUploader
   // 폴더 검증 (파이썬 validate_files 대응)
   async validateFiles(files) {
     // 🔷 0-1. 검증 모드 신호 (0xCC) 1바이트
+    console.log("0xCC");
+
     await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
     await this.waitForACK();
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
 
     // 🔷 0-2. 개수 전송 4바이트
+    console.log("개수 전송");
+
     await this.writer.write(this.packUint32LE(files.length));
     await this.waitForACK();
     await new Promise(resolve => setTimeout(resolve, SEND_TERM));
@@ -335,11 +339,15 @@ class SDCardUploader
       const fileSize = fileData.byteLength;
       //console.log(`📥 최종 다운로드한 파일 크기: ${fileSize} bytes`);
 
+
+      console.warn("메타 데이터 전송");
+
       await this.sendFileMetadata(relativePath, fileSize);
 
-      //console.log(`⌚검증 기다리기`);
+      console.log(`⌚검증 기다리기1`);
       try 
       {
+        console.log(`⌚검증 기다리기2`);
         await this.waitForACK();
        // console.log(`✅ ${send_file_index} 검증 완료: ${relativePath}`);
       } 
@@ -347,13 +355,19 @@ class SDCardUploader
       {
         console.log(`❌ ${send_file_index} 검증 실패: ${relativePath}`);
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+        console.log(`⌚파일전송`);
         await this.sendFile(fileUrl, relativePath); // 재전송
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+        console.log(`0xCC`);
         await this.writer.write(new Uint8Array([0xCC])); // 검증 모드
         await this.waitForACK();
         await new Promise(resolve => setTimeout(resolve, SEND_TERM));
+
+        console.log("개수 전송");        
         await this.writer.write(this.packUint32LE(files.length- send_file_index));
         await this.waitForACK();
+
         console.log(`✔️ ${send_file_index} 남은 갯수: ${files.length - send_file_index}개`);  
       }
       await new Promise(resolve => setTimeout(resolve, SEND_TERM));
